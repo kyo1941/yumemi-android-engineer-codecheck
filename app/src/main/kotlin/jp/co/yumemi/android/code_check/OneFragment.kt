@@ -28,7 +28,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             DividerItemDecoration(context!!, layoutManager.orientation)
         val adapter = CustomAdapter(object : CustomAdapter.OnItemClickListener {
             override fun itemClick(item: item) {
-                gotoRepositoryFragment(item)
+                goToRepositoryFragment(item)
             }
         })
 
@@ -52,14 +52,14 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         }
     }
 
-    fun gotoRepositoryFragment(item: item) {
+    fun goToRepositoryFragment(item: item) {
         val action = OneFragmentDirections
             .actionRepositoriesFragmentToRepositoryFragment(item = item)
         findNavController().navigate(action)
     }
 }
 
-val diff_util = object : DiffUtil.ItemCallback<item>() {
+val diffUtil = object : DiffUtil.ItemCallback<item>() {
     override fun areItemsTheSame(oldItem: item, newItem: item): Boolean {
         return oldItem.name == newItem.name
     }
@@ -72,7 +72,7 @@ val diff_util = object : DiffUtil.ItemCallback<item>() {
 
 class CustomAdapter(
     private val itemClickListener: OnItemClickListener,
-) : ListAdapter<item, CustomAdapter.ViewHolder>(diff_util) {
+) : ListAdapter<item, CustomAdapter.ViewHolder>(diffUtil) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
