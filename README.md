@@ -14,7 +14,7 @@
 ### 環境
 
 - IDE：Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
-- Kotlin：1.6.21
+- Kotlin：1.9.20
 - Java：11
 - Gradle：8.11.1
 - AGP：8.10.1
