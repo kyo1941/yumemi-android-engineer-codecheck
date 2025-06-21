@@ -76,7 +76,7 @@ class OneViewModel(
 }
 
 @Parcelize
-data class item(
+data class Item(
     val name: String,
     val ownerIconUrl: String,
     val language: String,
