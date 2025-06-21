@@ -10,9 +10,12 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
+import kotlinx.coroutines.launch
+
 
 class OneFragment : Fragment(R.layout.fragment_one) {
 
@@ -34,8 +37,9 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             .setOnEditorActionListener { editText, action, _ ->
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
                     editText.text.toString().let {
-                        viewModel.searchResults(it).apply {
-                            adapter.submitList(this)
+                        lifecycleScope.launch {
+                            val items = viewModel.searchResults(it)
+                            adapter.submitList(items)
                         }
                     }
                     return@setOnEditorActionListener true

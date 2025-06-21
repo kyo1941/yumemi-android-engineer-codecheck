@@ -27,16 +27,14 @@ class OneViewModel(
 ) : ViewModel() {
 
     // 検索結果
-    fun searchResults(inputText: String): List<Item> = runBlocking {
+    suspend fun searchResults(inputText: String): List<Item> {
         val client = HttpClient(Android)
 
-        return@runBlocking GlobalScope.async {
-            val response: HttpResponse = client.get("https://api.github.com/search/repositories") {
-                header("Accept", "application/vnd.github.v3+json")
-                parameter("q", inputText)
-            }
-
-            val jsonBody = JSONObject(response.receive<String>())
+        return client.get("https://api.github.com/search/repositories") {
+            header("Accept", "application/vnd.github.v3+json")
+            parameter("q", inputText)
+        }.let { response ->
+            val jsonBody = JSONObject(response.body<String>())
 
             val jsonItems = jsonBody.optJSONArray("items")!!
 
@@ -66,9 +64,8 @@ class OneViewModel(
             }
 
             lastSearchDate = Date()
-
-            return@async items.toList()
-        }.await()
+            items.toList()
+        }
     }
 }
 
