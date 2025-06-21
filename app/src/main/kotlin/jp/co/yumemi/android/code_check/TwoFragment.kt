@@ -28,9 +28,9 @@ class TwoFragment : Fragment(R.layout.fragment_two) {
         binding.ownerIconView.load(item.ownerIconUrl)
         binding.nameView.text = item.name
         binding.languageView.text = item.language
-        binding.starsView.text = "${item.stargazersCount} stars"
-        binding.watchersView.text = "${item.watchersCount} watchers"
-        binding.forksView.text = "${item.forksCount} forks"
-        binding.openIssuesView.text = "${item.openIssuesCount} open issues"
+        binding.starsView.text = getString(R.string.stars_count, item.stargazersCount)
+        binding.watchersView.text = getString(R.string.watchers_count, item.watchersCount)
+        binding.forksView.text = getString(R.string.forks_count, item.forksCount)
+        binding.openIssuesView.text = getString(R.string.open_issues_count, item.openIssuesCount)
     }
 }
