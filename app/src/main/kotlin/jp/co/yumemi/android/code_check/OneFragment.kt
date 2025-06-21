@@ -26,11 +26,9 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         val layoutManager = LinearLayoutManager(context!!)
         val dividerItemDecoration =
             DividerItemDecoration(context!!, layoutManager.orientation)
-        val adapter = CustomAdapter(object : CustomAdapter.OnItemClickListener {
-            override fun itemClick(item: Item) {
-                goToRepositoryFragment(item)
-            }
-        })
+        val adapter = CustomAdapter { item ->
+            goToRepositoryFragment(item)
+        }
 
         binding.searchInputText
             .setOnEditorActionListener { editText, action, _ ->
@@ -60,7 +58,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 }
 
 class CustomAdapter(
-    private val itemClickListener: OnItemClickListener,
+    private val onItemClick: (Item) -> Unit,
 ) : ListAdapter<Item, CustomAdapter.ViewHolder>(diffUtil) {
 
     companion object {
@@ -77,10 +75,6 @@ class CustomAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    interface OnItemClickListener {
-        fun itemClick(item: Item)
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_item, parent, false)
@@ -93,7 +87,7 @@ class CustomAdapter(
             item.name
 
         holder.itemView.setOnClickListener {
-            itemClickListener.itemClick(item)
+            onItemClick(item)
         }
     }
 }
