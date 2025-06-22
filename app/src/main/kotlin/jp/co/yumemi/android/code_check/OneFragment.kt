@@ -71,26 +71,26 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                         } catch (e: Exception) {
                             when(e) {
                                 is BadRequestException ->
-                                    showErrorSnackbar(getString(R.string.error_bad_request))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
 
                                 is RateLimitException -> {
                                     val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
-                                    showErrorSnackbar(getString(R.string.error_rate_limit, waitSeconds))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
                                 }
 
                                 is UnauthorizedException ->
-                                    showErrorSnackbar(getString(R.string.error_unauthorized))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
 
                                 is NotFoundException ->
-                                    showErrorSnackbar(getString(R.string.error_not_found))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
 
                                 is ClientErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_client))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
                                     Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
 
                                 is ServerErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_server))
+                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
                                     Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
 

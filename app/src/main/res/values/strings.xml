@@ -10,6 +10,7 @@
     <string name="error_client">検索に問題が発生しました。キーワードを変更するか、ネットワーク接続を確認してください</string>
     <string name="error_server">サーバーでエラーが発生しています。しばらく待ってからお試しください</string>
     <string name="error_unknown">予期せぬエラーが発生しました。インターネット接続を確認して再度お試しください</string>
+    <string name="error_with_code">[%1$d] %2$s</string>
 
     <string name="written_language">Written in %s</string>
     <string name="stars_count">%1$d stars</string>

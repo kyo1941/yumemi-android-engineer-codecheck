@@ -69,13 +69,13 @@ class GitHubRepositoryImpl(): GitHubRepository {
                 return items.toList()
             }
 
-            400 -> throw BadRequestException()
+            400 -> throw BadRequestException(response.status.value)
 
-            401 -> throw UnauthorizedException()
+            401 -> throw UnauthorizedException(response.status.value)
 
             403 -> handleRateLimitError(response)
 
-            404 -> throw NotFoundException()
+            404 -> throw NotFoundException(response.status.value)
 
             in 400..499 -> throw ClientErrorException(response.status.value, response.status.description)
 
@@ -105,6 +105,6 @@ class GitHubRepositoryImpl(): GitHubRepository {
 
         val resetTime = System.currentTimeMillis() + waitTimeMs
 
-        throw RateLimitException(resetTimeMs = resetTime)
+        throw RateLimitException(statusCode = response.status.value, resetTimeMs = resetTime)
     }
 }
