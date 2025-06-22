@@ -12,6 +12,7 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
+import jp.co.yumemi.android.code_check.domain.GitHubRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -23,49 +24,12 @@ import java.util.*
  * TwoFragment で使う
  */
 class OneViewModel(
-    val context: Context
+    private val repository: GitHubRepository
 ) : ViewModel() {
 
     // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
-        val client = HttpClient(Android)
-
-        return client.get("https://api.github.com/search/repositories") {
-            header("Accept", "application/vnd.github.v3+json")
-            parameter("q", inputText)
-        }.let { response ->
-            val jsonBody = JSONObject(response.body<String>())
-
-            val jsonItems = jsonBody.optJSONArray("items") ?: org.json.JSONArray()
-
-            val items = mutableListOf<Item>()
-
-            for (i in 0 until jsonItems.length()) {
-                val jsonItem = jsonItems.optJSONObject(i) ?: continue
-                val name = jsonItem.optString("full_name")
-                val ownerIconUrl = jsonItem.optJSONObject("owner")?.optString("avatar_url") ?: ""
-                val language = jsonItem.optString("language")
-                val stargazersCount = jsonItem.optLong("stargazers_count")
-                val watchersCount = jsonItem.optLong("watchers_count")
-                val forksCount = jsonItem.optLong("forks_count")
-                val openIssuesCount = jsonItem.optLong("open_issues_count")
-
-                items.add(
-                    Item(
-                        name = name,
-                        ownerIconUrl = ownerIconUrl,
-                        language = context.getString(R.string.written_language, language),
-                        stargazersCount = stargazersCount,
-                        watchersCount = watchersCount,
-                        forksCount = forksCount,
-                        openIssuesCount = openIssuesCount
-                    )
-                )
-            }
-
-            lastSearchDate = Date()
-            items.toList()
-        }
+        return repository.searchRepositories(inputText)
     }
 }
 

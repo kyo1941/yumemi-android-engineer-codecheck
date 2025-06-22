@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
 import kotlinx.coroutines.launch
 
@@ -24,7 +25,8 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
         val binding = FragmentOneBinding.bind(view)
 
-        val viewModel = OneViewModel(requireContext())
+        val repository = GitHubRepositoryImpl(requireContext())
+        val viewModel = OneViewModel(repository)
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
