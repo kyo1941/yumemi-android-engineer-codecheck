@@ -50,6 +50,8 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
                     binding.searchInputLayout.isErrorEnabled = false
 
+                    hideKeyboard(editText)
+
                     lifecycleScope.launch {
                         val items = viewModel.searchResults(inputText)
                         adapter.submitList(items)
@@ -71,6 +73,12 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         val action = OneFragmentDirections
             .actionRepositoriesFragmentToRepositoryFragment(item = item)
         findNavController().navigate(action)
+    }
+
+    private fun hideKeyboard(view: View) {
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        view.clearFocus()
     }
 }
 
