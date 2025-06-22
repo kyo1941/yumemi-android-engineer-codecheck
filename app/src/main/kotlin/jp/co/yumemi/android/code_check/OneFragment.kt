@@ -25,7 +25,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
         val binding = FragmentOneBinding.bind(view)
 
-        val repository = GitHubRepositoryImpl(requireContext())
+        val repository = GitHubRepositoryImpl()
         val viewModel = OneViewModel(repository)
 
         val layoutManager = LinearLayoutManager(requireContext())

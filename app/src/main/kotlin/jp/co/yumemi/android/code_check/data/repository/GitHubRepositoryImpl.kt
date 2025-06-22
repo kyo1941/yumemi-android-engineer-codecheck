@@ -1,20 +1,16 @@
 package jp.co.yumemi.android.code_check.data.repository
 
-import android.content.Context
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import jp.co.yumemi.android.code_check.Item
-import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import org.json.JSONObject
 import java.util.Date
 
-class GitHubRepositoryImpl(
-    private val context: Context
-): GitHubRepository {
+class GitHubRepositoryImpl(): GitHubRepository {
     override suspend fun searchRepositories(query: String): List<Item> {
         return GitHubApiClient.client.get("https://api.github.com/search/repositories") {
             header("Accept", "application/vnd.github.v3+json")
@@ -42,7 +38,7 @@ class GitHubRepositoryImpl(
                     Item(
                         name = name,
                         ownerIconUrl = ownerIconUrl,
-                        language = context.getString(R.string.written_language, language),
+                        language = language,
                         stargazersCount = stargazersCount,
                         watchersCount = watchersCount,
                         forksCount = forksCount,
