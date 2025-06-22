@@ -21,8 +21,8 @@ import kotlin.text.toLongOrNull
 
 class GitHubRepositoryImpl(): GitHubRepository {
     companion object {
-        private val DEFAULT_WAIT_TIME_MS = 60 * 1000L
-        private val MIN_WAIT_TIME_MS = 1000L
+        private const val DEFAULT_WAIT_TIME_MS = 60 * 1000L
+        private const val MIN_WAIT_TIME_MS = 1000L
     }
 
     override suspend fun searchRepositories(query: String): List<Item> {
