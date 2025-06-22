@@ -38,12 +38,25 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         binding.searchInputText
             .setOnEditorActionListener { editText, action, _ ->
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
-                    editText.text.toString().let {
-                        lifecycleScope.launch {
-                            val items = viewModel.searchResults(it)
-                            adapter.submitList(items)
-                        }
+                    val inputText = editText.text.toString().trim()
+
+                    if (inputText.isEmpty()) {
+                        binding.searchInputLayout.error = getString(R.string.error_empty_search)
+                        binding.searchInputLayout.isErrorEnabled = true
+                        binding.searchInputText.requestFocus()
+
+                        return@setOnEditorActionListener true
                     }
+
+                    binding.searchInputLayout.isErrorEnabled = false
+
+                    hideKeyboard(editText)
+
+                    lifecycleScope.launch {
+                        val items = viewModel.searchResults(inputText)
+                        adapter.submitList(items)
+                    }
+
                     return@setOnEditorActionListener true
                 }
                 return@setOnEditorActionListener false
@@ -56,10 +69,16 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         }
     }
 
-    fun goToRepositoryFragment(item: Item) {
+    private fun goToRepositoryFragment(item: Item) {
         val action = OneFragmentDirections
             .actionRepositoriesFragmentToRepositoryFragment(item = item)
         findNavController().navigate(action)
+    }
+
+    private fun hideKeyboard(view: View) {
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+        imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        view.clearFocus()
     }
 }
 
