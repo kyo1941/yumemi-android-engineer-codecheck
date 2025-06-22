@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
+import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import kotlinx.coroutines.launch
 
 
@@ -61,12 +63,25 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                             val items = viewModel.searchResults(inputText)
                             adapter.submitList(items)
                         } catch (e: Exception) {
-                            Snackbar.make(
-                                binding.root,
-                                getString(R.string.error_search_failed, e.message),
-                                Snackbar.LENGTH_LONG
-                            ).show()
+                            when(e) {
+                                is RateLimitException -> {
+                                    val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
 
+                                    Snackbar.make(
+                                        binding.root,
+                                        getString(R.string.error_rate_limit, waitSeconds),
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                }
+                                else -> {
+                                    Snackbar.make(
+                                        binding.root,
+                                        getString(R.string.error_search_failed),
+                                        Snackbar.LENGTH_LONG
+                                    ).show()
+                                    Log.e("OneFragment", "Search failed", e)
+                                }
+                            }
                             adapter.submitList(emptyList())
                         } finally {
                             binding.progressBar.visibility = View.GONE

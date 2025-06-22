@@ -4,18 +4,28 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
 import jp.co.yumemi.android.code_check.Item
 import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
+import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import org.json.JSONObject
 import java.util.Date
+import kotlin.text.toIntOrNull
+import kotlin.text.toLongOrNull
 
 class GitHubRepositoryImpl(): GitHubRepository {
     override suspend fun searchRepositories(query: String): List<Item> {
-        return GitHubApiClient.client.get("https://api.github.com/search/repositories") {
+        val response = GitHubApiClient.client.get("https://api.github.com/search/repositories") {
             header("Accept", "application/vnd.github.v3+json")
             parameter("q", query)
-        }.let { response ->
+        }
+
+        if (response.status.value == 403) {
+            handleRateLimitError(response)
+        }
+
+        if (response.status.value == 200) {
             val jsonBody = JSONObject(response.body<String>())
 
             val jsonItems = jsonBody.optJSONArray("items") ?: org.json.JSONArray()
@@ -48,7 +58,32 @@ class GitHubRepositoryImpl(): GitHubRepository {
                 )
             }
 
-            items.toList()
+            return items.toList()
         }
+
+        return emptyList()
+    }
+
+    private fun handleRateLimitError(response: HttpResponse) {
+        val retryAfter = response.headers["Retry-After"]?.toLongOrNull()
+        val rateReset = response.headers["X-RateLimit-Reset"]?.toLongOrNull()
+        val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull() ?: 0
+
+        val backoffTimeMs = 60 * 1000L
+
+        val waitTimeMs = when {
+            retryAfter != null -> retryAfter * 1000
+
+            remaining == 0 && rateReset != null -> {
+                val currentTimeSeconds = System.currentTimeMillis() / 1000
+                (rateReset - currentTimeSeconds) * 1000
+            }
+
+            else -> backoffTimeMs
+        }.coerceAtLeast(1000)
+
+        val resetTime = System.currentTimeMillis() + waitTimeMs
+
+        throw RateLimitException(resetTimeMs = resetTime)
     }
 }

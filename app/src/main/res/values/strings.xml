@@ -2,7 +2,8 @@
     <string name="app_name">Android Engineer CodeCheck</string>
     <string name="searchInputText_hint">GitHub のリポジトリを検索できるよー</string>
     <string name="error_empty_search">検索キーワードを入力してください</string>
-    <string name="error_search_failed">データを取得できませんでした %s</string>
+    <string name="error_rate_limit">APIレート制限に達しました。%1$d秒後に再試行してください</string>
+    <string name="error_search_failed">データを取得できませんでした</string>
     <string name="written_language">Written in %s</string>
     <string name="stars_count">%1$d stars</string>
     <string name="watchers_count">%1$d watchers</string>

@@ -17,7 +17,7 @@ class OneViewModel(
 ) : ViewModel() {
 
     private var lastSearchTime: Long = 0
-    private val minSearchInterval = 500L
+    private val minSearchInterval = 2000L
 
     // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
@@ -28,11 +28,11 @@ class OneViewModel(
             kotlinx.coroutines.delay(minSearchInterval - timeSinceLastSearch)
         }
 
-        val results = repository.searchRepositories(inputText)
-        
-        lastSearchTime = System.currentTimeMillis()
-
-        return results
+        try {
+            return repository.searchRepositories(inputText)
+        } finally {
+            lastSearchTime = System.currentTimeMillis()
+        }
     }
 }
 
