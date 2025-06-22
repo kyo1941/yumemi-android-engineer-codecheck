@@ -28,12 +28,19 @@ import kotlinx.coroutines.launch
 
 
 class OneFragment : Fragment(R.layout.fragment_one) {
-    private lateinit var binding: FragmentOneBinding
+    private var _binding: FragmentOneBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentOneBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding = FragmentOneBinding.bind(view)
 
         val repository = GitHubRepositoryImpl()
         val viewModel = OneViewModel(repository)
@@ -72,32 +79,32 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                         } catch (e: ApiException) {
                             when(e) {
                                 is BadRequestException ->
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
 
                                 is RateLimitException -> {
                                     val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
                                 }
 
                                 is UnauthorizedException ->
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
 
                                 is NotFoundException ->
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
 
                                 is ClientErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
                                     Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
 
                                 is ServerErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
                                     Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
                             }
                             adapter.submitList(emptyList())
                         } catch (e: Exception) {
-                            showErrorSnackbar(getString(R.string.error_unknown))
+                            showErrorSnackbar(binding.root, getString(R.string.error_unknown))
                             Log.e("OneFragment", "Unknown error ", e)
                             adapter.submitList(emptyList())
                         } finally {
@@ -118,6 +125,11 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun goToRepositoryFragment(item: Item) {
         val action = OneFragmentDirections
             .actionRepositoriesFragmentToRepositoryFragment(item = item)
@@ -130,9 +142,9 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         view.clearFocus()
     }
 
-    private fun showErrorSnackbar(message: String) {
+    private fun showErrorSnackbar(view: View, message: String) {
         Snackbar.make(
-            binding.root,
+            view,
             message,
             Snackbar.LENGTH_LONG
         ).show()
