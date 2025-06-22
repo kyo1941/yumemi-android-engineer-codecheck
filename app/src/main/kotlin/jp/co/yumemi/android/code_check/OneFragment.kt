@@ -38,12 +38,17 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         binding.searchInputText
             .setOnEditorActionListener { editText, action, _ ->
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
-                    editText.text.toString().let {
-                        lifecycleScope.launch {
-                            val items = viewModel.searchResults(it)
-                            adapter.submitList(items)
-                        }
+                    val inputText = editText.text.toString().trim()
+
+                    if (inputText.isEmpty()) {
+                        return@setOnEditorActionListener true
                     }
+
+                    lifecycleScope.launch {
+                        val items = viewModel.searchResults(inputText)
+                        adapter.submitList(items)
+                    }
+
                     return@setOnEditorActionListener true
                 }
                 return@setOnEditorActionListener false
