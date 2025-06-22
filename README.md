@@ -14,7 +14,7 @@
 ### 環境
 
 - IDE：Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
-- Kotlin：1.6.21
+- Kotlin：1.9.20
 - Java：11
 - Gradle：8.11.1
 - AGP：8.10.1
@@ -33,3 +33,4 @@
 
 - issue/PRの活用
     - テンプレートを使用してわかりやすいissue/PRの作成を心がけます
+    - Geminiを使用してレビューを行い，修正漏れの発生や潜在的なリスクの発見に役立てます
