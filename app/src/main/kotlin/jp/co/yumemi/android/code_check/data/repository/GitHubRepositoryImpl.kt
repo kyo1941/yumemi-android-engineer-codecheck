@@ -7,7 +7,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import jp.co.yumemi.android.code_check.Item
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
 import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import org.json.JSONObject
@@ -27,6 +26,8 @@ class GitHubRepositoryImpl(
 
             val items = mutableListOf<Item>()
 
+            val searchedAt = Date()
+
             for (i in 0 until jsonItems.length()) {
                 val jsonItem = jsonItems.optJSONObject(i) ?: continue
                 val name = jsonItem.optString("full_name")
@@ -45,12 +46,12 @@ class GitHubRepositoryImpl(
                         stargazersCount = stargazersCount,
                         watchersCount = watchersCount,
                         forksCount = forksCount,
-                        openIssuesCount = openIssuesCount
+                        openIssuesCount = openIssuesCount,
+                        searchedAt = searchedAt
                     )
                 )
             }
 
-            lastSearchDate = Date()
             items.toList()
         }
     }

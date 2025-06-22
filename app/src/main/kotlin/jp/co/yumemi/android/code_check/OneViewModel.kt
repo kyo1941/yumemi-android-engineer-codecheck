@@ -7,6 +7,7 @@ import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import kotlinx.parcelize.Parcelize
+import java.util.Date
 
 /**
  * TwoFragment で使う
@@ -30,4 +31,5 @@ data class Item(
     val watchersCount: Long,
     val forksCount: Long,
     val openIssuesCount: Long,
+    val searchedAt: Date = Date()
 ) : Parcelable
