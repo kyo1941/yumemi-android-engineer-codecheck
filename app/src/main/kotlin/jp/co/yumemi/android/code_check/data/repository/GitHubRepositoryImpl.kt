@@ -9,7 +9,7 @@ import jp.co.yumemi.android.code_check.Item
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
 import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
-import jp.co.yumemi.android.code_check.domain.GitHubRepository
+import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import org.json.JSONObject
 import java.util.Date
 
