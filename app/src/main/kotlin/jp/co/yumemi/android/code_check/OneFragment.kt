@@ -41,8 +41,14 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     val inputText = editText.text.toString().trim()
 
                     if (inputText.isEmpty()) {
+                        binding.searchInputLayout.error = getString(R.string.error_empty_search)
+                        binding.searchInputLayout.isErrorEnabled = true
+                        binding.searchInputText.requestFocus()
+
                         return@setOnEditorActionListener true
                     }
+
+                    binding.searchInputLayout.isErrorEnabled = false
 
                     lifecycleScope.launch {
                         val items = viewModel.searchResults(inputText)
