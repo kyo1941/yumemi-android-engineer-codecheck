@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
+import jp.co.yumemi.android.code_check.exceptions.ApiException
 import jp.co.yumemi.android.code_check.exceptions.BadRequestException
 import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
 import jp.co.yumemi.android.code_check.exceptions.NotFoundException
@@ -68,7 +69,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
                             val items = viewModel.searchResults(inputText)
                             adapter.submitList(items)
-                        } catch (e: Exception) {
+                        } catch (e: ApiException) {
                             when(e) {
                                 is BadRequestException ->
                                     showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
@@ -93,12 +94,11 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                                     showErrorSnackbar(getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
                                     Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
-
-                                else -> {
-                                    showErrorSnackbar(getString(R.string.error_unknown))
-                                    Log.e("OneFragment", "Other error: ", e)
-                                }
                             }
+                            adapter.submitList(emptyList())
+                        } catch (e: Exception) {
+                            showErrorSnackbar(getString(R.string.error_unknown))
+                            Log.e("OneFragment", "Unknown error ", e)
                             adapter.submitList(emptyList())
                         } finally {
                             binding.progressBar.visibility = View.GONE
