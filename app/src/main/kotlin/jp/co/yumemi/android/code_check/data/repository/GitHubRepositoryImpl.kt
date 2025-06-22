@@ -14,7 +14,6 @@ import jp.co.yumemi.android.code_check.exceptions.NotFoundException
 import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
-import jp.co.yumemi.android.code_check.exceptions.UnknownErrorException
 import org.json.JSONObject
 import java.util.Date
 import kotlin.text.toIntOrNull
@@ -82,7 +81,7 @@ class GitHubRepositoryImpl(): GitHubRepository {
 
             in 500..599 -> throw ServerErrorException(response.status.value, response.status.description)
 
-            else -> throw UnknownErrorException(response.status.value, response.status.description)
+            else -> throw Exception()
         }
 
         return emptyList()

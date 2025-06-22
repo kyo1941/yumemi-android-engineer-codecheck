@@ -85,18 +85,18 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                                     showErrorSnackbar(getString(R.string.error_not_found))
 
                                 is ClientErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_client, e.statusCode, e.statusDescription))
+                                    showErrorSnackbar(getString(R.string.error_client))
                                     Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
 
                                 is ServerErrorException -> {
-                                    showErrorSnackbar(getString(R.string.error_server, e.statusCode, e.statusDescription))
+                                    showErrorSnackbar(getString(R.string.error_server))
                                     Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
                                 }
 
                                 else -> {
                                     showErrorSnackbar(getString(R.string.error_unknown))
-                                    Log.e("OneFragment", "Search failed", e)
+                                    Log.e("OneFragment", "Other error: ", e)
                                 }
                             }
                             adapter.submitList(emptyList())
