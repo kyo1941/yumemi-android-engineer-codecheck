@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import com.google.android.material.snackbar.Snackbar
 import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
 import kotlinx.coroutines.launch
@@ -53,8 +54,24 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     hideKeyboard(editText)
 
                     lifecycleScope.launch {
-                        val items = viewModel.searchResults(inputText)
-                        adapter.submitList(items)
+                        try {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.INVISIBLE
+
+                            val items = viewModel.searchResults(inputText)
+                            adapter.submitList(items)
+                        } catch (e: Exception) {
+                            Snackbar.make(
+                                binding.root,
+                                getString(R.string.error_search_failed, e.message),
+                                Snackbar.LENGTH_LONG
+                            ).show()
+
+                            adapter.submitList(emptyList())
+                        } finally {
+                            binding.progressBar.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                        }
                     }
 
                     return@setOnEditorActionListener true

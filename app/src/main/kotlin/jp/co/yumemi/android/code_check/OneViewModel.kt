@@ -16,9 +16,23 @@ class OneViewModel(
     private val repository: GitHubRepository
 ) : ViewModel() {
 
+    private var lastSearchTime: Long = 0
+    private val minSearchInterval = 2000L
+
     // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
-        return repository.searchRepositories(inputText)
+        val currentTime = System.currentTimeMillis()
+        val timeSinceLastSearch = currentTime - lastSearchTime
+
+        if (lastSearchTime > 0 && timeSinceLastSearch < minSearchInterval) {
+            kotlinx.coroutines.delay(minSearchInterval - timeSinceLastSearch)
+        }
+
+        val results = repository.searchRepositories(inputText)
+        
+        lastSearchTime = System.currentTimeMillis()
+
+        return results
     }
 }
 
