@@ -2,6 +2,16 @@
     <string name="app_name">Android Engineer CodeCheck</string>
     <string name="searchInputText_hint">GitHub のリポジトリを検索できるよー</string>
     <string name="error_empty_search">検索キーワードを入力してください</string>
+
+    <string name="error_bad_request">不正なリクエストです。検索キーワードに不正な文字が含まれている可能性があります</string>
+    <string name="error_rate_limit">APIレート制限に達しました。%1$d秒後に再試行してください</string>
+    <string name="error_unauthorized">認証が必要です</string>
+    <string name="error_not_found">リソースが見つかりません</string>
+    <string name="error_client">検索に問題が発生しました。キーワードを変更するか、ネットワーク接続を確認してください</string>
+    <string name="error_server">サーバーでエラーが発生しています。しばらく待ってからお試しください</string>
+    <string name="error_unknown">予期せぬエラーが発生しました。インターネット接続を確認して再度お試しください</string>
+    <string name="error_with_code">[%1$d] %2$s</string>
+
     <string name="written_language">Written in %s</string>
     <string name="stars_count">%1$d stars</string>
     <string name="watchers_count">%1$d watchers</string>

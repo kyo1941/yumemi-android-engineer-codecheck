@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,17 +14,33 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import com.google.android.material.snackbar.Snackbar
 import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
+import jp.co.yumemi.android.code_check.exceptions.ApiException
+import jp.co.yumemi.android.code_check.exceptions.BadRequestException
+import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
+import jp.co.yumemi.android.code_check.exceptions.NotFoundException
+import jp.co.yumemi.android.code_check.exceptions.RateLimitException
+import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
+import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.launch
 
 
 class OneFragment : Fragment(R.layout.fragment_one) {
+    private var _binding: FragmentOneBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentOneBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val binding = FragmentOneBinding.bind(view)
 
         val repository = GitHubRepositoryImpl()
         val viewModel = OneViewModel(repository)
@@ -53,8 +70,47 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     hideKeyboard(editText)
 
                     lifecycleScope.launch {
-                        val items = viewModel.searchResults(inputText)
-                        adapter.submitList(items)
+                        try {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.INVISIBLE
+
+                            val items = viewModel.searchResults(inputText)
+                            adapter.submitList(items)
+                        } catch (e: ApiException) {
+                            when(e) {
+                                is BadRequestException ->
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
+
+                                is RateLimitException -> {
+                                    val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
+                                }
+
+                                is UnauthorizedException ->
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
+
+                                is NotFoundException ->
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
+
+                                is ClientErrorException -> {
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
+                                    Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
+                                }
+
+                                is ServerErrorException -> {
+                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
+                                    Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
+                                }
+                            }
+                            adapter.submitList(emptyList())
+                        } catch (e: Exception) {
+                            showErrorSnackbar(binding.root, getString(R.string.error_unknown))
+                            Log.e("OneFragment", "Unknown error ", e)
+                            adapter.submitList(emptyList())
+                        } finally {
+                            binding.progressBar.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                        }
                     }
 
                     return@setOnEditorActionListener true
@@ -69,6 +125,11 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun goToRepositoryFragment(item: Item) {
         val action = OneFragmentDirections
             .actionRepositoriesFragmentToRepositoryFragment(item = item)
@@ -79,6 +140,14 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
         view.clearFocus()
+    }
+
+    private fun showErrorSnackbar(view: View, message: String) {
+        Snackbar.make(
+            view,
+            message,
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 }
 

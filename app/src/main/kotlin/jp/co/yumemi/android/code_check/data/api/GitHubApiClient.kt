@@ -5,6 +5,6 @@ import io.ktor.client.engine.android.Android
 
 object GitHubApiClient {
     val client = HttpClient(Android) {
-        expectSuccess = true
+        expectSuccess = false
     }
 }
