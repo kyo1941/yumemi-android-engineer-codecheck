@@ -15,6 +15,11 @@ import kotlin.text.toIntOrNull
 import kotlin.text.toLongOrNull
 
 class GitHubRepositoryImpl(): GitHubRepository {
+    companion object {
+        private val DEFAULT_WAIT_TIME_MS = 60 * 1000L
+        private val MIN_WAIT_TIME_MS = 1000L
+    }
+
     override suspend fun searchRepositories(query: String): List<Item> {
         val response = GitHubApiClient.client.get("https://api.github.com/search/repositories") {
             header("Accept", "application/vnd.github.v3+json")
@@ -69,8 +74,6 @@ class GitHubRepositoryImpl(): GitHubRepository {
         val rateReset = response.headers["X-RateLimit-Reset"]?.toLongOrNull()
         val remaining = response.headers["X-RateLimit-Remaining"]?.toIntOrNull() ?: 0
 
-        val backoffTimeMs = 60 * 1000L
-
         val waitTimeMs = when {
             retryAfter != null -> retryAfter * 1000
 
@@ -79,8 +82,8 @@ class GitHubRepositoryImpl(): GitHubRepository {
                 (rateReset - currentTimeSeconds) * 1000
             }
 
-            else -> backoffTimeMs
-        }.coerceAtLeast(1000)
+            else -> DEFAULT_WAIT_TIME_MS
+        }.coerceAtLeast(MIN_WAIT_TIME_MS)
 
         val resetTime = System.currentTimeMillis() + waitTimeMs
 
