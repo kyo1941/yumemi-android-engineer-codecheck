@@ -17,7 +17,7 @@ class OneViewModel(
 ) : ViewModel() {
 
     private var lastSearchTime: Long = 0
-    private val minSearchInterval = 2000L
+    private val minSearchInterval = 500L
 
     // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
