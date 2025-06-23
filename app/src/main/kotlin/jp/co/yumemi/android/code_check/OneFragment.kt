@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -138,41 +137,5 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             message,
             Snackbar.LENGTH_LONG
         ).show()
-    }
-}
-
-class CustomAdapter(
-    private val onItemClick: (Item) -> Unit,
-) : ListAdapter<Item, CustomAdapter.ViewHolder>(diffUtil) {
-
-    companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Item>() {
-            override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
-                return oldItem.name == newItem.name
-            }
-
-            override fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val repositoryNameView: TextView = view.findViewById(R.id.repositoryNameView)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.layout_item, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        holder.repositoryNameView.text = item.name
-
-        holder.itemView.setOnClickListener {
-            onItemClick(item)
-        }
     }
 }
