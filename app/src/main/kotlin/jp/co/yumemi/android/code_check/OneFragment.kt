@@ -42,13 +42,19 @@ class OneFragment : Fragment(R.layout.fragment_one) {
         val dividerItemDecoration =
             DividerItemDecoration(requireContext(), layoutManager.orientation)
         val adapter = CustomAdapter { item ->
-            goToRepositoryFragment(item)
+            viewModel.onRepositorySelected(item)
         }
 
         lifecycleScope.launch {
             viewModel.isLoading.collectLatest { isLoading ->
                 binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
                 binding.recyclerView.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.navigateToRepositoryFlow.collectLatest { item ->
+                goToRepositoryFragment(item)
             }
         }
 

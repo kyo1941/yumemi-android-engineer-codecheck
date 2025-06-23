@@ -38,6 +38,9 @@ class OneViewModel @Inject constructor (
     private val _isLoading = MutableStateFlow<Boolean>(false)
     val isLoading = _isLoading
 
+    private val _navigateToRepository = Channel<Item>()
+    val navigateToRepositoryFlow = _navigateToRepository.receiveAsFlow()
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
@@ -93,6 +96,12 @@ class OneViewModel @Inject constructor (
 
     fun isValidInput(inputText: String): Boolean {
         return inputText.isNotBlank()
+    }
+
+    fun onRepositorySelected(item: Item) {
+        viewModelScope.launch {
+            _navigateToRepository.send(item)
+        }
     }
 }
 
