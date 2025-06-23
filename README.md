@@ -14,13 +14,13 @@
 ### 環境
 
 - IDE：Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
-- Kotlin：1.9.20
+- Kotlin：1.9.21
 - Java：11
 - Gradle：8.11.1
 - AGP：8.10.1
 - minSdk：23
 - targetSdk：31
-- compileSdk：31
+- compileSdk：36
 
 ### 動作
 
@@ -34,3 +34,9 @@
 - issue/PRの活用
     - テンプレートを使用してわかりやすいissue/PRの作成を心がけます
     - Geminiを使用してレビューを行い，修正漏れの発生や潜在的なリスクの発見に役立てます
+
+- MVVMアーキテクチャを導入
+    - Dagger Hiltを使用してviewModelやGitHub API処理などを切り離して保守性を向上させました
+
+- GitHub APIのレート制限のエラー出力
+    - 比較的すぐにレート制限に引っかかったので，待機時間を取得してsnackbarに表示させました
