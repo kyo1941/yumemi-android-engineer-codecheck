@@ -83,6 +83,10 @@ class OneViewModel @Inject constructor (
             emptyList()
         }
     }
+
+    fun isValidInput(inputText: String): Boolean {
+        return inputText.isNotBlank()
+    }
 }
 
 @Parcelize

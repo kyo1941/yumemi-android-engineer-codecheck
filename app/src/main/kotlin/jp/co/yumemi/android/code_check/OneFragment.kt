@@ -50,7 +50,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
                     val inputText = editText.text.toString().trim()
 
-                    if (inputText.isEmpty()) {
+                    if (!viewModel.isValidInput(inputText)) {
                         binding.searchInputLayout.error = getString(R.string.error_empty_search)
                         binding.searchInputLayout.isErrorEnabled = true
                         binding.searchInputText.requestFocus()
