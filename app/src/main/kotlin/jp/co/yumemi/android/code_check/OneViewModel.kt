@@ -3,7 +3,6 @@
  */
 package jp.co.yumemi.android.code_check
 
-import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.Date
 import javax.inject.Inject
 
 /**
@@ -45,7 +43,6 @@ class OneViewModel @Inject constructor (
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
 
-    // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
         searchMutex.withLock {
             _isLoading.value = true
