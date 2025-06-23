@@ -14,13 +14,13 @@
 ### 環境
 
 - IDE：Android Studio Meerkat Feature Drop | 2024.3.2 Patch 1
-- Kotlin：1.9.20
+- Kotlin：1.9.21
 - Java：11
 - Gradle：8.11.1
 - AGP：8.10.1
 - minSdk：23
 - targetSdk：31
-- compileSdk：31
+- compileSdk：36
 
 ### 動作
 
