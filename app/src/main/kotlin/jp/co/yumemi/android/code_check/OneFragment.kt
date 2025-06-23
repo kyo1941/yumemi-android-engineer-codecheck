@@ -4,7 +4,6 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,15 +16,9 @@ import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
-import jp.co.yumemi.android.code_check.exceptions.ApiException
-import jp.co.yumemi.android.code_check.exceptions.BadRequestException
-import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
-import jp.co.yumemi.android.code_check.exceptions.NotFoundException
-import jp.co.yumemi.android.code_check.exceptions.RateLimitException
-import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
-import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class OneFragment : Fragment(R.layout.fragment_one) {
@@ -70,47 +63,14 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     hideKeyboard(editText)
 
                     lifecycleScope.launch {
-                        try {
-                            binding.progressBar.visibility = View.VISIBLE
-                            binding.recyclerView.visibility = View.INVISIBLE
+                        binding.progressBar.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.INVISIBLE
 
-                            val items = viewModel.searchResults(inputText)
-                            adapter.submitList(items)
-                        } catch (e: ApiException) {
-                            when(e) {
-                                is BadRequestException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
+                        val items = viewModel.searchResults(inputText)
+                        adapter.submitList(items)
 
-                                is RateLimitException -> {
-                                    val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
-                                }
-
-                                is UnauthorizedException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
-
-                                is NotFoundException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
-
-                                is ClientErrorException -> {
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
-                                    Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
-                                }
-
-                                is ServerErrorException -> {
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
-                                    Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
-                                }
-                            }
-                            adapter.submitList(emptyList())
-                        } catch (e: Exception) {
-                            showErrorSnackbar(binding.root, getString(R.string.error_unknown))
-                            Log.e("OneFragment", "Unknown error ", e)
-                            adapter.submitList(emptyList())
-                        } finally {
-                            binding.progressBar.visibility = View.GONE
-                            binding.recyclerView.visibility = View.VISIBLE
-                        }
+                        binding.progressBar.visibility = View.GONE
+                        binding.recyclerView.visibility = View.VISIBLE
                     }
 
                     return@setOnEditorActionListener true
@@ -122,6 +82,28 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             it.layoutManager = layoutManager
             it.addItemDecoration(dividerItemDecoration)
             it.adapter = adapter
+        }
+
+        lifecycleScope.launch {
+            viewModel.showErrorFlow.collectLatest { message ->
+                when (message) {
+                    is UserMessage.SnackBar -> {
+                        val errorMessage = if (message.formatArgs.isNotEmpty()) {
+                            if (message.formatArgs[1] is Int) {
+                                val statusCode = message.formatArgs[0] as Int
+                                val errorDetailResId = message.formatArgs[1] as Int
+                                val errorDetailMessage = getString(errorDetailResId, *message.formatArgs.sliceArray(2 until message.formatArgs.size))
+                                getString(message.messageResId, statusCode, errorDetailMessage)
+                            } else {
+                                getString(message.messageResId, *message.formatArgs)
+                            }
+                        } else {
+                            getString(message.messageResId)
+                        }
+                        showErrorSnackbar(binding.root, errorMessage)
+                    }
+                }
+            }
         }
     }
 
