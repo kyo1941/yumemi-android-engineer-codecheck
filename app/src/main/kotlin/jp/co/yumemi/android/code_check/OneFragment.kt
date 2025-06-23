@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
-import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
+import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
 import jp.co.yumemi.android.code_check.exceptions.ApiException
 import jp.co.yumemi.android.code_check.exceptions.BadRequestException
@@ -25,11 +25,14 @@ import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.launch
+import androidx.fragment.app.viewModels
 
-
+@AndroidEntryPoint
 class OneFragment : Fragment(R.layout.fragment_one) {
     private var _binding: FragmentOneBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: OneViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,9 +44,6 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val repository = GitHubRepositoryImpl()
-        val viewModel = OneViewModel(repository)
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =

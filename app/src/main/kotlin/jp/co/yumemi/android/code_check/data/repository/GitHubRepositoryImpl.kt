@@ -16,10 +16,11 @@ import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import org.json.JSONObject
 import java.util.Date
+import javax.inject.Inject
 import kotlin.text.toIntOrNull
 import kotlin.text.toLongOrNull
 
-class GitHubRepositoryImpl(): GitHubRepository {
+class GitHubRepositoryImpl @Inject constructor() : GitHubRepository {
     companion object {
         private const val DEFAULT_WAIT_TIME_MS = 60 * 1000L
         private const val MIN_WAIT_TIME_MS = 1000L

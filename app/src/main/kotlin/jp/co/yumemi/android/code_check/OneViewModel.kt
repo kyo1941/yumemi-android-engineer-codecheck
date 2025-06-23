@@ -5,16 +5,19 @@ package jp.co.yumemi.android.code_check
 
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.parcelize.Parcelize
 import java.util.Date
+import javax.inject.Inject
 
 /**
  * TwoFragment で使う
  */
-class OneViewModel(
+@HiltViewModel
+class OneViewModel @Inject constructor (
     private val repository: GitHubRepository
 ) : ViewModel() {
 
