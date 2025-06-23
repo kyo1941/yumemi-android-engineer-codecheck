@@ -7,6 +7,7 @@ import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.ApiException
 import jp.co.yumemi.android.code_check.exceptions.BadRequestException
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.parcelize.Parcelize
 import java.util.Date
 import javax.inject.Inject
 
@@ -104,15 +104,3 @@ class OneViewModel @Inject constructor (
         }
     }
 }
-
-@Parcelize
-data class Item(
-    val name: String,
-    val ownerIconUrl: String,
-    val language: String,
-    val stargazersCount: Long,
-    val watchersCount: Long,
-    val forksCount: Long,
-    val openIssuesCount: Long,
-    val searchedAt: Date = Date()
-) : Parcelable

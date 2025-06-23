@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
+import jp.co.yumemi.android.code_check.domain.model.Item
 import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
 import kotlinx.coroutines.flow.collectLatest
