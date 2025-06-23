@@ -4,32 +4,28 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
 import com.google.android.material.snackbar.Snackbar
-import jp.co.yumemi.android.code_check.data.repository.GitHubRepositoryImpl
+import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
-import jp.co.yumemi.android.code_check.exceptions.ApiException
-import jp.co.yumemi.android.code_check.exceptions.BadRequestException
-import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
-import jp.co.yumemi.android.code_check.exceptions.NotFoundException
-import jp.co.yumemi.android.code_check.exceptions.RateLimitException
-import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
-import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
+import jp.co.yumemi.android.code_check.domain.model.Item
 import kotlinx.coroutines.launch
+import androidx.fragment.app.viewModels
+import kotlinx.coroutines.flow.collectLatest
 
-
+@AndroidEntryPoint
 class OneFragment : Fragment(R.layout.fragment_one) {
     private var _binding: FragmentOneBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: OneViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,14 +38,24 @@ class OneFragment : Fragment(R.layout.fragment_one) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val repository = GitHubRepositoryImpl()
-        val viewModel = OneViewModel(repository)
-
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
             DividerItemDecoration(requireContext(), layoutManager.orientation)
         val adapter = CustomAdapter { item ->
-            goToRepositoryFragment(item)
+            viewModel.onRepositorySelected(item)
+        }
+
+        lifecycleScope.launch {
+            viewModel.isLoading.collectLatest { isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.recyclerView.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.navigateToRepositoryFlow.collectLatest { item ->
+                goToRepositoryFragment(item)
+            }
         }
 
         binding.searchInputText
@@ -57,7 +63,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
                     val inputText = editText.text.toString().trim()
 
-                    if (inputText.isEmpty()) {
+                    if (!viewModel.isValidInput(inputText)) {
                         binding.searchInputLayout.error = getString(R.string.error_empty_search)
                         binding.searchInputLayout.isErrorEnabled = true
                         binding.searchInputText.requestFocus()
@@ -70,47 +76,8 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     hideKeyboard(editText)
 
                     lifecycleScope.launch {
-                        try {
-                            binding.progressBar.visibility = View.VISIBLE
-                            binding.recyclerView.visibility = View.INVISIBLE
-
-                            val items = viewModel.searchResults(inputText)
-                            adapter.submitList(items)
-                        } catch (e: ApiException) {
-                            when(e) {
-                                is BadRequestException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_bad_request)))
-
-                                is RateLimitException -> {
-                                    val waitSeconds = ((e.resetTimeMs - System.currentTimeMillis()) / 1000).coerceAtLeast(1)
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_rate_limit, waitSeconds)))
-                                }
-
-                                is UnauthorizedException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_unauthorized)))
-
-                                is NotFoundException ->
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_not_found)))
-
-                                is ClientErrorException -> {
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_client)))
-                                    Log.e("OneFragment", "Client error: ${e.statusCode} - ${e.statusDescription}", e)
-                                }
-
-                                is ServerErrorException -> {
-                                    showErrorSnackbar(binding.root, getString(R.string.error_with_code, e.statusCode, getString(R.string.error_server)))
-                                    Log.e("OneFragment", "Server error: ${e.statusCode} - ${e.statusDescription}", e)
-                                }
-                            }
-                            adapter.submitList(emptyList())
-                        } catch (e: Exception) {
-                            showErrorSnackbar(binding.root, getString(R.string.error_unknown))
-                            Log.e("OneFragment", "Unknown error ", e)
-                            adapter.submitList(emptyList())
-                        } finally {
-                            binding.progressBar.visibility = View.GONE
-                            binding.recyclerView.visibility = View.VISIBLE
-                        }
+                        val items = viewModel.searchResults(inputText)
+                        adapter.submitList(items)
                     }
 
                     return@setOnEditorActionListener true
@@ -122,6 +89,28 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             it.layoutManager = layoutManager
             it.addItemDecoration(dividerItemDecoration)
             it.adapter = adapter
+        }
+
+        lifecycleScope.launch {
+            viewModel.showErrorFlow.collectLatest { message ->
+                when (message) {
+                    is UserMessage.SnackBar -> {
+                        val errorMessage = if (message.formatArgs.isNotEmpty()) {
+                            if (message.formatArgs[1] is Int) {
+                                val statusCode = message.formatArgs[0] as Int
+                                val errorDetailResId = message.formatArgs[1] as Int
+                                val errorDetailMessage = getString(errorDetailResId, *message.formatArgs.sliceArray(2 until message.formatArgs.size))
+                                getString(message.messageResId, statusCode, errorDetailMessage)
+                            } else {
+                                getString(message.messageResId, *message.formatArgs)
+                            }
+                        } else {
+                            getString(message.messageResId)
+                        }
+                        showErrorSnackbar(binding.root, errorMessage)
+                    }
+                }
+            }
         }
     }
 
@@ -148,41 +137,5 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             message,
             Snackbar.LENGTH_LONG
         ).show()
-    }
-}
-
-class CustomAdapter(
-    private val onItemClick: (Item) -> Unit,
-) : ListAdapter<Item, CustomAdapter.ViewHolder>(diffUtil) {
-
-    companion object {
-        val diffUtil = object : DiffUtil.ItemCallback<Item>() {
-            override fun areItemsTheSame(oldItem: Item, newItem: Item): Boolean {
-                return oldItem.name == newItem.name
-            }
-
-            override fun areContentsTheSame(oldItem: Item, newItem: Item): Boolean {
-                return oldItem == newItem
-            }
-        }
-    }
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val repositoryNameView: TextView = view.findViewById(R.id.repositoryNameView)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.layout_item, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-        holder.repositoryNameView.text = item.name
-
-        holder.itemView.setOnClickListener {
-            onItemClick(item)
-        }
     }
 }
