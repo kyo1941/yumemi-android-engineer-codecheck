@@ -45,6 +45,13 @@ class OneFragment : Fragment(R.layout.fragment_one) {
             goToRepositoryFragment(item)
         }
 
+        lifecycleScope.launch {
+            viewModel.isLoading.collectLatest { isLoading ->
+                binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+                binding.recyclerView.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+            }
+        }
+
         binding.searchInputText
             .setOnEditorActionListener { editText, action, _ ->
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
@@ -63,14 +70,8 @@ class OneFragment : Fragment(R.layout.fragment_one) {
                     hideKeyboard(editText)
 
                     lifecycleScope.launch {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.INVISIBLE
-
                         val items = viewModel.searchResults(inputText)
                         adapter.submitList(items)
-
-                        binding.progressBar.visibility = View.GONE
-                        binding.recyclerView.visibility = View.VISIBLE
                     }
 
                     return@setOnEditorActionListener true

@@ -16,6 +16,7 @@ import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -34,6 +35,9 @@ class OneViewModel @Inject constructor (
     private val _showErrorChannel = Channel<UserMessage>()
     val showErrorFlow = _showErrorChannel.receiveAsFlow()
 
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading = _isLoading
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
@@ -41,6 +45,7 @@ class OneViewModel @Inject constructor (
     // 検索結果
     suspend fun searchResults(inputText: String): List<Item> {
         searchMutex.withLock {
+            _isLoading.value = true
             val currentTime = System.currentTimeMillis()
             val timeSinceLastSearch = currentTime - lastSearchTime
 
@@ -81,6 +86,8 @@ class OneViewModel @Inject constructor (
                 _showErrorChannel.send(UserMessage.SnackBar(R.string.error_unknown))
             }
             emptyList()
+        } finally {
+            _isLoading.value = false
         }
     }
 
