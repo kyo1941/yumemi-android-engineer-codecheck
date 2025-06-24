@@ -1,11 +1,10 @@
-/*
- * Copyright © 2021 YUMEMI Inc. All rights reserved.
- */
-package jp.co.yumemi.android.code_check
+package jp.co.yumemi.android.code_check.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.common.UserMessage
 import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.ApiException
@@ -16,6 +15,7 @@ import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -39,26 +39,37 @@ class OneViewModel @Inject constructor (
     private val _navigateToRepository = Channel<Item>()
     val navigateToRepositoryFlow = _navigateToRepository.receiveAsFlow()
 
+    private val _isEmptyInput = MutableStateFlow<Boolean>(false)
+    val isEmptyInput = _isEmptyInput
+
+    private val _searchText = MutableStateFlow<String>("")
+    val searchText = _searchText
+
+    private val _items = MutableStateFlow<List<Item>>(emptyList())
+    val items = _items
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
 
-    suspend fun searchResults(inputText: String): List<Item> {
+    suspend fun searchResults(inputText: String) {
         searchMutex.withLock {
             _isLoading.value = true
             val currentTime = System.currentTimeMillis()
             val timeSinceLastSearch = currentTime - lastSearchTime
 
             if (lastSearchTime > 0 && timeSinceLastSearch < minSearchInterval) {
-                kotlinx.coroutines.delay(minSearchInterval - timeSinceLastSearch)
+                delay(minSearchInterval - timeSinceLastSearch)
             }
 
             lastSearchTime = System.currentTimeMillis()
         }
 
-        return try {
-            repository.searchRepositories(inputText)
+        try {
+            val result = repository.searchRepositories(inputText)
+            _items.value = result
         } catch (e: ApiException) {
+            _items.value = emptyList()
             val snackbarMessage = when (e) {
                 is BadRequestException ->
                     UserMessage.SnackBar(R.string.error_with_code, arrayOf(e.statusCode, R.string.error_bad_request))
@@ -80,19 +91,33 @@ class OneViewModel @Inject constructor (
             viewModelScope.launch {
                 _showErrorChannel.send(snackbarMessage)
             }
-            emptyList()
         } catch (e: Exception) {
+            _items.value = emptyList()
             viewModelScope.launch {
                 _showErrorChannel.send(UserMessage.SnackBar(R.string.error_unknown))
             }
-            emptyList()
         } finally {
             _isLoading.value = false
         }
     }
 
+    fun onSearchTextChanged(newText: String) {
+        _searchText.value = newText
+        if(newText.isNotEmpty()) {
+            _isEmptyInput.value = false
+        }
+    }
+
     fun isValidInput(inputText: String): Boolean {
         return inputText.isNotBlank()
+    }
+
+    fun setEmptyInput(isEmpty: Boolean) {
+        _isEmptyInput.value = isEmpty
+    }
+
+    fun clearResults() {
+        _items.value = emptyList()
     }
 
     fun onRepositorySelected(item: Item) {
