@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -76,7 +77,7 @@ fun OneScreen(
             .fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
             .pointerInput(Unit) {
-                detectTapGestures( onTap = {
+                detectTapGestures(onTap = {
                     focusManager.clearFocus()
                 })
             }
@@ -84,7 +85,13 @@ fun OneScreen(
         OutlinedTextField(
             value = searchText,
             onValueChange = { viewModel.onSearchTextChanged(it) },
-            label = { Text(stringResource(R.string.searchInputText_hint)) },
+            label = {
+                Text(
+                    text = stringResource(R.string.searchInputText_hint),
+                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    fontWeight = MaterialTheme.typography.bodySmall.fontWeight
+                )
+            },
             singleLine = true,
             maxLines = 1,
             isError = isEmptyInput,
