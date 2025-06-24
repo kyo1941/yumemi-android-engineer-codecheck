@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun OneScreen(
     viewModel: OneViewModel = hiltViewModel()
 ) {
-    var searchText by remember { mutableStateOf("") }
+    val searchText by viewModel.searchText.collectAsState()
     var items by remember { mutableStateOf<List<Item>>(emptyList()) }
 
     val isEmptyInput by viewModel.isEmptyInput.collectAsState()
@@ -59,7 +59,7 @@ fun OneScreen(
     ) {
         OutlinedTextField(
             value = searchText,
-            onValueChange = { searchText = it },
+            onValueChange = { viewModel.onSearchTextChanged(it) },
             label = { Text(stringResource(R.string.searchInputText_hint)) },
             singleLine = true,
             maxLines = 1,
@@ -78,7 +78,7 @@ fun OneScreen(
             },
             trailingIcon = {
                 if (searchText.isNotEmpty()) {
-                    IconButton(onClick = { searchText = "" }) {
+                    IconButton(onClick = { viewModel.onSearchTextChanged("") }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear Text",

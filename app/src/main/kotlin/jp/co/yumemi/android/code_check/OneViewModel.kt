@@ -42,6 +42,9 @@ class OneViewModel @Inject constructor (
     private val _isEmptyInput = MutableStateFlow<Boolean>(false)
     val isEmptyInput = _isEmptyInput
 
+    private val _searchText = MutableStateFlow<String>("")
+    val searchText = _searchText
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
@@ -92,6 +95,10 @@ class OneViewModel @Inject constructor (
         } finally {
             _isLoading.value = false
         }
+    }
+
+    fun onSearchTextChanged(newText: String) {
+        _searchText.value = newText
     }
 
     fun isValidInput(inputText: String): Boolean {
