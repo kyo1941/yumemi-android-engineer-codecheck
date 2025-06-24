@@ -1,23 +1,28 @@
 package jp.co.yumemi.android.code_check.ui
 
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,12 +35,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import jp.co.yumemi.android.code_check.OneViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import jp.co.yumemi.android.code_check.R
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun OneScreen(
+    navController: NavController,
     viewModel: OneViewModel = hiltViewModel()
 ) {
     val searchText by viewModel.searchText.collectAsState()
@@ -46,6 +54,12 @@ fun OneScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        viewModel.navigateToRepositoryFlow.collectLatest { item ->
+            navController.navigate("repository/${Uri.encode(item.name)}")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -116,9 +130,22 @@ fun OneScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(items.size) { index ->
-                    val item = items[index]
-                    Text(text = item.name)
+                itemsIndexed(items) { index, item ->
+                    Text(
+                        text = item.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clickable {
+                                viewModel.onRepositorySelected(item)
+                            }
+                    )
+                    if (index < items.lastIndex) {
+                        HorizontalDivider(
+                            color = Color.LightGray,
+                            thickness = 1.dp
+                        )
+                    }
                 }
             }
         }
