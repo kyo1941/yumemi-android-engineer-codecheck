@@ -20,10 +20,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,8 +31,6 @@ import androidx.compose.ui.unit.dp
 import jp.co.yumemi.android.code_check.OneViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.domain.model.Item
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -44,7 +39,7 @@ fun OneScreen(
     viewModel: OneViewModel = hiltViewModel()
 ) {
     val searchText by viewModel.searchText.collectAsState()
-    var items by remember { mutableStateOf<List<Item>>(emptyList()) }
+    val items by viewModel.items.collectAsState()
 
     val isEmptyInput by viewModel.isEmptyInput.collectAsState()
 
@@ -96,7 +91,7 @@ fun OneScreen(
                     }
                     viewModel.setEmptyInput(false)
                     coroutineScope.launch {
-                        items = viewModel.searchResults(searchText)
+                        viewModel.searchResults(searchText)
                         keyboardController?.hide()
                     }
                 }
@@ -127,6 +122,5 @@ fun OneScreen(
                 }
             }
         }
-
     }
 }

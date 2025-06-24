@@ -45,11 +45,14 @@ class OneViewModel @Inject constructor (
     private val _searchText = MutableStateFlow<String>("")
     val searchText = _searchText
 
+    private val _items = MutableStateFlow<List<Item>>(emptyList())
+    val items = _items
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
 
-    suspend fun searchResults(inputText: String): List<Item> {
+    suspend fun searchResults(inputText: String) {
         searchMutex.withLock {
             _isLoading.value = true
             val currentTime = System.currentTimeMillis()
@@ -62,9 +65,11 @@ class OneViewModel @Inject constructor (
             lastSearchTime = System.currentTimeMillis()
         }
 
-        return try {
-            repository.searchRepositories(inputText)
+        try {
+            val result = repository.searchRepositories(inputText)
+            _items.value = result
         } catch (e: ApiException) {
+            _items.value = emptyList()
             val snackbarMessage = when (e) {
                 is BadRequestException ->
                     UserMessage.SnackBar(R.string.error_with_code, arrayOf(e.statusCode, R.string.error_bad_request))
@@ -86,12 +91,11 @@ class OneViewModel @Inject constructor (
             viewModelScope.launch {
                 _showErrorChannel.send(snackbarMessage)
             }
-            emptyList()
         } catch (e: Exception) {
+            _items.value = emptyList()
             viewModelScope.launch {
                 _showErrorChannel.send(UserMessage.SnackBar(R.string.error_unknown))
             }
-            emptyList()
         } finally {
             _isLoading.value = false
         }

@@ -77,7 +77,7 @@ class OneFragment : Fragment(R.layout.fragment_one) {
 
                     lifecycleScope.launch {
                         val items = viewModel.searchResults(inputText)
-                        adapter.submitList(items)
+                        // adapter.submitList(items)
                     }
 
                     return@setOnEditorActionListener true
