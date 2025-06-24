@@ -63,8 +63,7 @@ fun RepositoryScreen(
 
         Text(
             text = item.name,
-            fontWeight = MaterialTheme.typography.headlineMedium.fontWeight,
-            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+            style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -73,8 +72,7 @@ fun RepositoryScreen(
 
         Text(
             text = "Information",
-            fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
@@ -90,15 +88,30 @@ fun RepositoryScreen(
         ) {
             Spacer(modifier = Modifier.weight(0.5f))
 
-            Text(text = "Written in ${item.language}")
+            Text(
+                text = item.language,
+                style = MaterialTheme.typography.bodyLarge
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
             Column {
-                Text(text = "${item.stargazersCount} stars")
-                Text(text = "${item.watchersCount} watchers")
-                Text(text = "${item.forksCount} forks")
-                Text(text = "${item.openIssuesCount} open issues")
+                Text(
+                    text = "${item.stargazersCount} stars",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${item.watchersCount} watchers",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${item.forksCount} forks",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${item.openIssuesCount} open issues",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
 
             Spacer(modifier = Modifier.weight(0.5f))

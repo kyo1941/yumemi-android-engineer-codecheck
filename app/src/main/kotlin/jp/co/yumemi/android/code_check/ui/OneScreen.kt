@@ -105,8 +105,7 @@ fun OneScreen(
             label = {
                 Text(
                     text = stringResource(R.string.searchInputText_hint),
-                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                    fontWeight = MaterialTheme.typography.bodySmall.fontWeight
+                    style = MaterialTheme.typography.bodySmall
                 )
             },
             shape = RoundedCornerShape(16.dp),
