@@ -1,6 +1,7 @@
 package jp.co.yumemi.android.code_check.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,6 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -59,6 +62,8 @@ fun OneScreen(
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(Unit) {
         viewModel.navigateToRepositoryFlow.collectLatest { item ->
             navController.currentBackStackEntry?.savedStateHandle?.set("item", item)
@@ -70,6 +75,11 @@ fun OneScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
+            .pointerInput(Unit) {
+                detectTapGestures( onTap = {
+                    focusManager.clearFocus()
+                })
+            }
     ) {
         OutlinedTextField(
             value = searchText,
