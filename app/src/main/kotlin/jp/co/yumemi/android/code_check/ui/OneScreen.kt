@@ -40,9 +40,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.TypedArrayUtils.getString
 import jp.co.yumemi.android.code_check.OneViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -79,13 +82,23 @@ fun OneScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
-            .padding(vertical = 8.dp)
+            .padding(8.dp)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     focusManager.clearFocus()
                 })
             }
     ) {
+        Text(
+            text = stringResource(R.string.app_name),
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            textAlign = TextAlign.Center,
+        )
+
         OutlinedTextField(
             value = searchText,
             onValueChange = { viewModel.onSearchTextChanged(it) },
@@ -141,7 +154,7 @@ fun OneScreen(
                 }
             ),
             colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.LightGray,
             ),
             modifier = Modifier.fillMaxWidth().shadow(40.dp, RoundedCornerShape(16.dp))
         )
