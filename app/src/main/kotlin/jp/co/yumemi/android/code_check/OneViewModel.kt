@@ -39,6 +39,9 @@ class OneViewModel @Inject constructor (
     private val _navigateToRepository = Channel<Item>()
     val navigateToRepositoryFlow = _navigateToRepository.receiveAsFlow()
 
+    private val _isEmptyInput = MutableStateFlow<Boolean>(false)
+    val isEmptyInput = _isEmptyInput
+
     private val searchMutex = Mutex()
     private var lastSearchTime: Long = 0
     private val minSearchInterval = 1000L
@@ -93,6 +96,10 @@ class OneViewModel @Inject constructor (
 
     fun isValidInput(inputText: String): Boolean {
         return inputText.isNotBlank()
+    }
+
+    fun setEmptyInput(isEmpty: Boolean) {
+        _isEmptyInput.value = isEmpty
     }
 
     fun onRepositorySelected(item: Item) {

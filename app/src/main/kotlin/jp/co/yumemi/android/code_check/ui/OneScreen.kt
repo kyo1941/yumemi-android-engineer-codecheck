@@ -35,6 +35,7 @@ import jp.co.yumemi.android.code_check.OneViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.domain.model.Item
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -45,7 +46,7 @@ fun OneScreen(
     var searchText by remember { mutableStateOf("") }
     var items by remember { mutableStateOf<List<Item>>(emptyList()) }
 
-    var isEmptyInput by remember { mutableStateOf(false) }
+    val isEmptyInput by viewModel.isEmptyInput.collectAsState()
 
     val isLoading by viewModel.isLoading.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -58,12 +59,7 @@ fun OneScreen(
     ) {
         OutlinedTextField(
             value = searchText,
-            onValueChange = {
-                searchText = it
-                if (isEmptyInput && viewModel.isValidInput(it)) {
-                    isEmptyInput = false
-                }
-            },
+            onValueChange = { searchText = it },
             label = { Text(stringResource(R.string.searchInputText_hint)) },
             singleLine = true,
             maxLines = 1,
@@ -95,10 +91,10 @@ fun OneScreen(
             keyboardActions = KeyboardActions(
                 onSearch = {
                     if (!viewModel.isValidInput(searchText)) {
-                        isEmptyInput = true
+                        viewModel.setEmptyInput(true)
                         return@KeyboardActions
                     }
-                    isEmptyInput = false
+                    viewModel.setEmptyInput(false)
                     coroutineScope.launch {
                         items = viewModel.searchResults(searchText)
                         keyboardController?.hide()
