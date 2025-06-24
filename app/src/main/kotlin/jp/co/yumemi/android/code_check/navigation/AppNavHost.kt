@@ -31,7 +31,10 @@ fun AppNavHost() {
                 }
             }
             if (item != null) {
-                RepositoryScreen(item = item)
+                RepositoryScreen(
+                    navController = navController,
+                    item = item
+                )
             }
 
         }

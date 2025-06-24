@@ -2,6 +2,8 @@ package jp.co.yumemi.android.code_check.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,18 +14,33 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.domain.model.Item
 import coil.compose.AsyncImage
 
 @Composable
-fun RepositoryScreen(item: Item) {
+fun RepositoryScreen(
+    navController: NavController,
+    item: Item
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        IconButton(
+            modifier = Modifier.align(Alignment.Start),
+            onClick = {
+                navController.popBackStack()
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
+                contentDescription = "back one screen",
+            )
+        }
         AsyncImage(
             model = item.ownerIconUrl,
             contentDescription = "owner icon",
