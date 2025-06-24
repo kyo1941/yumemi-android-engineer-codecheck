@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.domain.model.Item
@@ -20,7 +21,7 @@ fun RepositoryScreen(item: Item) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
@@ -33,17 +34,31 @@ fun RepositoryScreen(item: Item) {
             placeholder = painterResource(id = R.drawable.jetbrains),
         )
 
-        Spacer(modifier = Modifier.weight(0.1f))
-
         Text(
             text = item.name,
-            fontWeight = MaterialTheme.typography.headlineSmall.fontWeight,
-            fontSize = MaterialTheme.typography.headlineSmall.fontSize
+            fontWeight = MaterialTheme.typography.headlineMedium.fontWeight,
+            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textAlign = TextAlign.Center,
+        )
+
+        Text(
+            text = "Information",
+            fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Left,
         )
 
         Spacer(modifier = Modifier.weight(0.1f))
 
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Text(text = "Written in ${item.language}")
 
             Spacer(modifier = Modifier.weight(1f))
