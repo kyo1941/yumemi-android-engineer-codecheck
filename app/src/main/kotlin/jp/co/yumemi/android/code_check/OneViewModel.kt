@@ -113,6 +113,10 @@ class OneViewModel @Inject constructor (
         _isEmptyInput.value = isEmpty
     }
 
+    fun clearResults() {
+        _items.value = emptyList()
+    }
+
     fun onRepositorySelected(item: Item) {
         viewModelScope.launch {
             _navigateToRepository.send(item)

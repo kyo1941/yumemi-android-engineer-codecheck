@@ -102,7 +102,10 @@ fun OneScreen(
             },
             trailingIcon = {
                 if (searchText.isNotEmpty()) {
-                    IconButton(onClick = { viewModel.onSearchTextChanged("") }) {
+                    IconButton(onClick = {
+                        viewModel.onSearchTextChanged("")
+                        viewModel.clearResults()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear Text",
