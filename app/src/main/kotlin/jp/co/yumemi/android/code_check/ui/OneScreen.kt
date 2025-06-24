@@ -1,6 +1,5 @@
 package jp.co.yumemi.android.code_check.ui
 
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues

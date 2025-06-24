@@ -1,17 +1,13 @@
 package jp.co.yumemi.android.code_check.navigation
 
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.ui.OneScreen
 import jp.co.yumemi.android.code_check.ui.RepositoryScreen
-import kotlin.text.get
 
 @Composable
 fun AppNavHost() {
