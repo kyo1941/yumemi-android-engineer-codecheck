@@ -2,6 +2,7 @@ package jp.co.yumemi.android.code_check.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,8 +29,15 @@ fun AppNavHost() {
             val item = navController.previousBackStackEntry
                 ?.savedStateHandle
                 ?.get<Item>("item")
-                ?: throw IllegalArgumentException("Repository item is required")
-            RepositoryScreen(item = item)
+            LaunchedEffect(Unit) {
+                if (item == null) {
+                    navController.popBackStack("one", inclusive = false)
+                }
+            }
+            if (item != null) {
+                RepositoryScreen(item = item)
+            }
+
         }
     }
 }
