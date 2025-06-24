@@ -3,9 +3,18 @@
  */
 package jp.co.yumemi.android.code_check
 
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import dagger.hilt.android.AndroidEntryPoint
+import jp.co.yumemi.android.code_check.ui.OneScreen
 
 @AndroidEntryPoint
-class TopActivity : AppCompatActivity(R.layout.activity_top) {
+class TopActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            OneScreen()
+        }
+    }
 }
