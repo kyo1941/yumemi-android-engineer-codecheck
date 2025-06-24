@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.UserMessage
+import jp.co.yumemi.android.code_check.common.UserMessage
 import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.ApiException
