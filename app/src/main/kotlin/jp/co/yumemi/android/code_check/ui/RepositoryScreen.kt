@@ -13,11 +13,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.domain.model.Item
 import coil.compose.AsyncImage
+import java.util.Date
 
 @Composable
 fun RepositoryScreen(
@@ -89,4 +92,22 @@ fun RepositoryScreen(
         }
         Spacer(modifier = Modifier.weight(1f))
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewRepositoryScreen() {
+    RepositoryScreen(
+        navController = rememberNavController(),
+        item = Item(
+            name = "JetBrains/kotlin",
+            ownerIconUrl = "",
+            language = "Kotlin",
+            stargazersCount = 38530,
+            watchersCount = 38530,
+            forksCount = 4675,
+            openIssuesCount = 131,
+            searchedAt = Date()
+        )
+    )
 }
