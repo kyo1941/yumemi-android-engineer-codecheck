@@ -1,11 +1,10 @@
-/*
- * Copyright © 2021 YUMEMI Inc. All rights reserved.
- */
-package jp.co.yumemi.android.code_check
+package jp.co.yumemi.android.code_check.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.UserMessage
 import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.ApiException
@@ -16,6 +15,7 @@ import jp.co.yumemi.android.code_check.exceptions.RateLimitException
 import jp.co.yumemi.android.code_check.exceptions.ServerErrorException
 import jp.co.yumemi.android.code_check.exceptions.UnauthorizedException
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -59,7 +59,7 @@ class OneViewModel @Inject constructor (
             val timeSinceLastSearch = currentTime - lastSearchTime
 
             if (lastSearchTime > 0 && timeSinceLastSearch < minSearchInterval) {
-                kotlinx.coroutines.delay(minSearchInterval - timeSinceLastSearch)
+                delay(minSearchInterval - timeSinceLastSearch)
             }
 
             lastSearchTime = System.currentTimeMillis()

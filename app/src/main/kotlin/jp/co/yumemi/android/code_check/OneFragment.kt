@@ -18,6 +18,7 @@ import jp.co.yumemi.android.code_check.databinding.FragmentOneBinding
 import jp.co.yumemi.android.code_check.domain.model.Item
 import kotlinx.coroutines.launch
 import androidx.fragment.app.viewModels
+import jp.co.yumemi.android.code_check.viewModel.OneViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
