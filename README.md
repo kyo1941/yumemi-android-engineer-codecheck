@@ -19,7 +19,7 @@
 - Gradle：8.11.1
 - AGP：8.10.1
 - minSdk：23
-- targetSdk：31
+- targetSdk：36
 - compileSdk：36
 
 ### 動作
@@ -34,6 +34,9 @@
 - issue/PRの活用
     - テンプレートを使用してわかりやすいissue/PRの作成を心がけます
     - Geminiを使用してレビューを行い，修正漏れの発生や潜在的なリスクの発見に役立てます
+
+- Jetpack Composeを導入
+    - モダンな技術を使用して保守性を向上させました
 
 - MVVMアーキテクチャを導入
     - Dagger Hiltを使用してviewModelやGitHub API処理などを切り離して保守性を向上させました
