@@ -103,6 +103,9 @@ class OneViewModel @Inject constructor (
 
     fun onSearchTextChanged(newText: String) {
         _searchText.value = newText
+        if(newText.isNotEmpty()) {
+            _isEmptyInput.value = false
+        }
     }
 
     fun isValidInput(inputText: String): Boolean {
