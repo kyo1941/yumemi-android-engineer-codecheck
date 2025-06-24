@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -75,11 +76,9 @@ fun RepositoryScreen(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(16.dp),
             textAlign = TextAlign.Left,
         )
-
-        Spacer(modifier = Modifier.weight(0.1f))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -97,19 +96,19 @@ fun RepositoryScreen(
 
             Column {
                 Text(
-                    text = "${item.stargazersCount} stars",
+                    text = stringResource(R.string.stars_count, item.stargazersCount),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "${item.watchersCount} watchers",
+                    text = stringResource(R.string.watchers_count, item.watchersCount),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "${item.forksCount} forks",
+                    text = stringResource(R.string.forks_count, item.forksCount),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "${item.openIssuesCount} open issues",
+                    text = stringResource(R.string.open_issues_count, item.openIssuesCount),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
