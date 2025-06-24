@@ -76,7 +76,7 @@ fun RepositoryScreen(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             textAlign = TextAlign.Left,
         )
 
