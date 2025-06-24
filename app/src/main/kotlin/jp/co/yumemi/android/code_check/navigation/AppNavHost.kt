@@ -7,8 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import jp.co.yumemi.android.code_check.domain.model.Item
 import jp.co.yumemi.android.code_check.ui.OneScreen
 import jp.co.yumemi.android.code_check.ui.RepositoryScreen
+import kotlin.text.get
 
 @Composable
 fun AppNavHost() {
@@ -22,13 +24,12 @@ fun AppNavHost() {
                 navController = navController,
             )
         }
-        composable(
-            "repository/{name}",
-            arguments = listOf(navArgument("name") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val name = backStackEntry.arguments?.getString("name")?.let { Uri.decode(it) }
-                ?: throw IllegalArgumentException("Repository name is required")
-            RepositoryScreen(repositoryName = name)
+        composable("repository") {
+            val item = navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.get<Item>("item")
+                ?: throw IllegalArgumentException("Repository item is required")
+            RepositoryScreen(item = item)
         }
     }
 }

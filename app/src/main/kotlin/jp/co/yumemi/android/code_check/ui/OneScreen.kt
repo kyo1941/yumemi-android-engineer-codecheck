@@ -57,7 +57,8 @@ fun OneScreen(
 
     LaunchedEffect(Unit) {
         viewModel.navigateToRepositoryFlow.collectLatest { item ->
-            navController.navigate("repository/${Uri.encode(item.name)}")
+            navController.currentBackStackEntry?.savedStateHandle?.set("item", item)
+            navController.navigate("repository")
         }
     }
 
