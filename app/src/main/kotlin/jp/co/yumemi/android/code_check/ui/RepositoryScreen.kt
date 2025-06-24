@@ -11,9 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -27,10 +29,15 @@ fun RepositoryScreen(
     navController: NavController,
     item: Item
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val imageSize: Dp = (screenHeight * 0.25f).coerceAtMost(160.dp)
+    val imageCornerRadius: Dp = (imageSize * 0.2f).coerceAtLeast(8.dp)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(WindowInsets.systemBars.asPaddingValues()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconButton(
@@ -48,8 +55,8 @@ fun RepositoryScreen(
             model = item.ownerIconUrl,
             contentDescription = "owner icon",
             modifier = Modifier
-                .size(160.dp)
-                .clip(RoundedCornerShape(32.dp)),
+                .size(imageSize)
+                .clip(RoundedCornerShape(imageCornerRadius)),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.jetbrains),
         )
@@ -68,7 +75,9 @@ fun RepositoryScreen(
             text = "Information",
             fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
             fontSize = MaterialTheme.typography.titleLarge.fontSize,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             textAlign = TextAlign.Left,
         )
 
@@ -79,6 +88,8 @@ fun RepositoryScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Spacer(modifier = Modifier.weight(0.5f))
+
             Text(text = "Written in ${item.language}")
 
             Spacer(modifier = Modifier.weight(1f))
@@ -89,6 +100,8 @@ fun RepositoryScreen(
                 Text(text = "${item.forksCount} forks")
                 Text(text = "${item.openIssuesCount} open issues")
             }
+
+            Spacer(modifier = Modifier.weight(0.5f))
         }
         Spacer(modifier = Modifier.weight(1f))
     }
