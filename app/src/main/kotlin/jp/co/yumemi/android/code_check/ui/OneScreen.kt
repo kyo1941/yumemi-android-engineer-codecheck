@@ -1,5 +1,7 @@
 package jp.co.yumemi.android.code_check.ui
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -70,6 +74,11 @@ fun OneScreen(
 
     val focusManager = LocalFocusManager.current
 
+    Log.d("ColorDebug", "LocalContentColor.current: ${LocalContentColor.current}")
+    Log.d("ColorDebug", "MaterialTheme.colorScheme.onSurface: ${MaterialTheme.colorScheme.onSurface}")
+    Log.d("ColorDebug", "MaterialTheme.colorScheme.onBackground: ${MaterialTheme.colorScheme.onBackground}")
+    Log.d("TypographyDebug", "headlineSmall color: ${MaterialTheme.typography.headlineSmall.color}")
+
     LaunchedEffect(Unit) {
         viewModel.navigateToRepositoryFlow.collectLatest { item ->
             navController.currentBackStackEntry?.savedStateHandle?.set("item", item)
@@ -90,12 +99,14 @@ fun OneScreen(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-            fontWeight = FontWeight.ExtraBold,
+            style = LocalTextStyle.current.copy(
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+                textAlign = TextAlign.Center
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            textAlign = TextAlign.Center,
         )
 
         OutlinedTextField(
@@ -104,7 +115,9 @@ fun OneScreen(
             label = {
                 Text(
                     text = stringResource(R.string.searchInputText_hint),
-                    style = MaterialTheme.typography.bodySmall
+                    style = LocalTextStyle.current.copy(
+                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    )
                 )
             },
             shape = RoundedCornerShape(16.dp),
@@ -113,7 +126,13 @@ fun OneScreen(
             isError = isEmptyInput,
             supportingText = {
                 if (isEmptyInput) {
-                    Text(stringResource(R.string.error_empty_search), color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = stringResource(R.string.error_empty_search),
+                        style = LocalTextStyle.current.copy(
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize
+                        ),
+                    )
                 }
             },
             leadingIcon = {
@@ -182,7 +201,8 @@ fun OneScreen(
                             .padding(vertical = 16.dp)
                             .clickable {
                                 viewModel.onRepositorySelected(item)
-                            }
+                            },
+                        style = LocalTextStyle.current
                     )
                     if (index < items.lastIndex) {
                         HorizontalDivider(

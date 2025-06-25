@@ -50,7 +50,7 @@ fun AppTheme(
     ) {
         CompositionLocalProvider(
             LocalTextStyle provides MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.onBackground
+                color = colorScheme.onBackground
             )
         ) {
             content()

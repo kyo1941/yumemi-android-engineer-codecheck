@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,7 +66,10 @@ fun RepositoryScreen(
 
         Text(
             text = item.name,
-            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+            style = LocalTextStyle.current.copy(
+                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -74,7 +78,9 @@ fun RepositoryScreen(
 
         Text(
             text = "Information",
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            style = LocalTextStyle.current.copy(
+                fontSize = MaterialTheme.typography.titleLarge.fontSize
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
@@ -90,7 +96,9 @@ fun RepositoryScreen(
 
             Text(
                 text = item.language,
-                fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                style = LocalTextStyle.current.copy(
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                ),
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -98,19 +106,27 @@ fun RepositoryScreen(
             Column {
                 Text(
                     text = stringResource(R.string.stars_count, item.stargazersCount),
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = LocalTextStyle.current.copy(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    )
                 )
                 Text(
                     text = stringResource(R.string.watchers_count, item.watchersCount),
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = LocalTextStyle.current.copy(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    )
                 )
                 Text(
                     text = stringResource(R.string.forks_count, item.forksCount),
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = LocalTextStyle.current.copy(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    )
                 )
                 Text(
                     text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = LocalTextStyle.current.copy(
+                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    )
                 )
             }
 
