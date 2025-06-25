@@ -64,7 +64,7 @@ fun RepositoryScreen(
 
         Text(
             text = item.name,
-            style = MaterialTheme.typography.headlineMedium,
+            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -73,7 +73,7 @@ fun RepositoryScreen(
 
         Text(
             text = "Information",
-            style = MaterialTheme.typography.titleLarge,
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
@@ -89,7 +89,7 @@ fun RepositoryScreen(
 
             Text(
                 text = item.language,
-                style = MaterialTheme.typography.bodyLarge
+                fontSize = MaterialTheme.typography.bodyLarge.fontSize
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -97,19 +97,19 @@ fun RepositoryScreen(
             Column {
                 Text(
                     text = stringResource(R.string.stars_count, item.stargazersCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Text(
                     text = stringResource(R.string.watchers_count, item.watchersCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Text(
                     text = stringResource(R.string.forks_count, item.forksCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
                 Text(
                     text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
                 )
             }
 

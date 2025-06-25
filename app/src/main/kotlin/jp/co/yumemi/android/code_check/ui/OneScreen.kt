@@ -90,11 +90,11 @@ fun OneScreen(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-            fontWeight = FontWeight.Bold,
+            fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+            fontWeight = FontWeight.ExtraBold,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(16.dp),
             textAlign = TextAlign.Center,
         )
 
