@@ -81,4 +81,10 @@ class GitHubRepositoryImplTest {
         val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
         repo.searchRepositories("kotlin")
     }
+
+    @Test(expected = Exception::class)
+    fun searchRepositories_throws_Exception_on_unexpected_status() = runTest {
+        val repo = createRepositoryWithMock(HttpStatusCode(600, "Unknown"))
+        repo.searchRepositories("kotlin")
+    }
 }
