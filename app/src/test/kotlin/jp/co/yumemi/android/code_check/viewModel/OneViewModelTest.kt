@@ -118,23 +118,21 @@ class OneViewModelTest {
     @Test
     fun searchResults_handlesUnauthorizedException() = testSearchResultsErrorHandler(
         query = "unauthorized",
-        thrownException = RateLimitException(401, System.currentTimeMillis() + 5000)
+        thrownException = UnauthorizedException(401)
     ) { snackbar ->
         assertEquals(R.string.error_with_code, snackbar.messageResId)
         assertEquals(401, snackbar.formatArgs[0])
-        assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
-        assertTrue((snackbar.formatArgs[2] as Long) >= 1)
+        assertEquals(R.string.error_unauthorized, snackbar.formatArgs[1])
     }
 
     @Test
     fun searchResults_handlesNotFoundException() = testSearchResultsErrorHandler(
-    query = "notfound",
-    thrownException = RateLimitException(404, System.currentTimeMillis() + 5000)
+        query = "notfound",
+        thrownException = NotFoundException(404)
     ) { snackbar ->
         assertEquals(R.string.error_with_code, snackbar.messageResId)
         assertEquals(404, snackbar.formatArgs[0])
-        assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
-        assertTrue((snackbar.formatArgs[2] as Long) >= 1)
+        assertEquals(R.string.error_not_found, snackbar.formatArgs[1])
     }
 
     @Test
