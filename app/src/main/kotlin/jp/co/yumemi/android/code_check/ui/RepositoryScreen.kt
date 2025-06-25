@@ -129,87 +129,97 @@ fun RepositoryScreen(
             Spacer(modifier = Modifier.weight(1f))
         }
     } else {
-        Row (
+        Column (
             modifier = Modifier
                 .fillMaxSize()
                 .padding(WindowInsets.systemBars.asPaddingValues()),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier.padding(start = 16.dp)
-            ) {
-                IconButton(
-                    onClick = {
-                        navController.popBackStack()
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
-                        contentDescription = "back one screen",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
+            IconButton(
+                onClick = {
+                    navController.popBackStack()
                 }
-                AsyncImage(
-                    model = item.ownerIconUrl,
-                    contentDescription = "owner icon",
-                    modifier = Modifier
-                        .size(imageSize)
-                        .clip(RoundedCornerShape(imageCornerRadius)),
-                    contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = R.drawable.jetbrains)
-                )
-
-                Text(
-                    text = item.name,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Bold
-                    )
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
+                    contentDescription = "back one screen",
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.8f))
 
-            Column(
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = item.language,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                )
+                Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    AsyncImage(
+                        model = item.ownerIconUrl,
+                        contentDescription = "owner icon",
+                        modifier = Modifier
+                            .size(imageSize)
+                            .clip(RoundedCornerShape(imageCornerRadius)),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.jetbrains)
+                    )
+
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
 
                 Column {
                     Text(
-                        text = stringResource(R.string.stars_count, item.stargazersCount),
+                        text = item.language,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = MaterialTheme.colorScheme.onBackground
-                        )
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Text(
-                        text = stringResource(R.string.watchers_count, item.watchersCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
+
+                    Column {
+                        Text(
+                            text = stringResource(R.string.stars_count, item.stargazersCount),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         )
-                    )
-                    Text(
-                        text = stringResource(R.string.forks_count, item.forksCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
+                        Text(
+                            text = stringResource(R.string.watchers_count, item.watchersCount),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         )
-                    )
-                    Text(
-                        text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
+                        Text(
+                            text = stringResource(R.string.forks_count, item.forksCount),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         )
-                    )
+                        Text(
+                            text = stringResource(R.string.open_issues_count, item.openIssuesCount),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.weight(1f))
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
