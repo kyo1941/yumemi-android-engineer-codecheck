@@ -30,6 +30,15 @@ import javax.inject.Inject
 class OneViewModel @Inject constructor (
     private val repository: GitHubRepository
 ) : ViewModel() {
+    private var clock: () -> Long = { System.currentTimeMillis() }
+
+    constructor(
+        repository: GitHubRepository,
+        clock: () -> Long
+    ) : this(repository) {
+        this.clock = clock
+    }
+
     private val _showErrorChannel = Channel<UserMessage>()
     val showErrorFlow = _showErrorChannel.receiveAsFlow()
 
@@ -55,14 +64,14 @@ class OneViewModel @Inject constructor (
     suspend fun searchResults(inputText: String) {
         searchMutex.withLock {
             _isLoading.value = true
-            val currentTime = System.currentTimeMillis()
+            val currentTime = clock()
             val timeSinceLastSearch = currentTime - lastSearchTime
 
             if (lastSearchTime > 0 && timeSinceLastSearch < minSearchInterval) {
                 delay(minSearchInterval - timeSinceLastSearch)
             }
 
-            lastSearchTime = System.currentTimeMillis()
+            lastSearchTime = clock()
         }
 
         try {

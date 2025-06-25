@@ -1,12 +1,12 @@
 package jp.co.yumemi.android.code_check.data.repository
 
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import jp.co.yumemi.android.code_check.domain.model.Item
-import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.BadRequestException
 import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
@@ -20,14 +20,16 @@ import javax.inject.Inject
 import kotlin.text.toIntOrNull
 import kotlin.text.toLongOrNull
 
-class GitHubRepositoryImpl @Inject constructor() : GitHubRepository {
+class GitHubRepositoryImpl @Inject constructor(
+    private val httpClient: HttpClient
+) : GitHubRepository {
     companion object {
         private const val DEFAULT_WAIT_TIME_MS = 60 * 1000L
         private const val MIN_WAIT_TIME_MS = 1000L
     }
 
     override suspend fun searchRepositories(query: String): List<Item> {
-        val response = GitHubApiClient.client.get("https://api.github.com/search/repositories") {
+        val response = httpClient.get("https://api.github.com/search/repositories") {
             header("Accept", "application/vnd.github.v3+json")
             parameter("q", query)
         }
