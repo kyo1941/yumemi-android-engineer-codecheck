@@ -64,21 +64,28 @@ class OneViewModelTest {
         assertFalse(viewModel.isLoading.first())
     }
 
-    @Test
-    fun searchResults_handlesBadRequestException() = runTest {
-        whenever(gitHubRepository.searchRepositories("invalid")).thenAnswer { throw BadRequestException(400) }
+    /**
+     * エラーハンドリングの共通テストロジック
+     * @param query 検索クエリ
+     * @param thrownException searchRepositoriesがスローする例外
+     * @param assertBlock SnackBarメッセージに対する追加のアサーション
+     */
+    private fun testSearchResultsErrorHandler(
+        query: String,
+        thrownException: Exception,
+        assertBlock: (snackbar: UserMessage.SnackBar) -> Unit = {}
+    ) = runTest {
+        whenever(gitHubRepository.searchRepositories(query)).thenAnswer { throw thrownException }
 
         val job = launch {
             viewModel.showErrorFlow.collect { message ->
                 assertTrue(message is UserMessage.SnackBar)
                 val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(400, snackbar.formatArgs[0])
-                assertEquals(R.string.error_bad_request, snackbar.formatArgs[1])
+                assertBlock(snackbar)
             }
         }
 
-        viewModel.searchResults("invalid")
+        viewModel.searchResults(query)
         advanceUntilIdle()
 
         assertTrue(viewModel.items.first().isEmpty())
@@ -87,136 +94,74 @@ class OneViewModelTest {
     }
 
     @Test
-    fun searchResults_handlesRateLimitException() = runTest {
-        val resetTime = System.currentTimeMillis() + 5000 // 5 seconds from now
-        whenever(gitHubRepository.searchRepositories("limit")).thenAnswer { throw RateLimitException(403, resetTime) }
-
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(403, snackbar.formatArgs[0])
-                assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
-                // We expect waitSeconds to be at least 1, due to `coerceAtLeast(1)`
-                assertTrue((snackbar.formatArgs[2] as Long) >= 1)
-            }
-        }
-
-        viewModel.searchResults("limit")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    fun searchResults_handlesBadRequestException() = testSearchResultsErrorHandler(
+        query = "invalid",
+        thrownException = BadRequestException(400)
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(400, snackbar.formatArgs[0])
+        assertEquals(R.string.error_bad_request, snackbar.formatArgs[1])
     }
 
     @Test
-    fun searchResults_handlesUnauthorizedException() = runTest {
-        whenever(gitHubRepository.searchRepositories("unauthorized")).thenAnswer { throw UnauthorizedException(401) }
-
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(401, snackbar.formatArgs[0])
-                assertEquals(R.string.error_unauthorized, snackbar.formatArgs[1])
-            }
-        }
-
-        viewModel.searchResults("unauthorized")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    fun searchResults_handlesRateLimitException() = testSearchResultsErrorHandler(
+        query = "limit",
+        thrownException = RateLimitException(403, System.currentTimeMillis() + 5000)
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(403, snackbar.formatArgs[0])
+        assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
+        assertTrue((snackbar.formatArgs[2] as Long) >= 1)
     }
 
     @Test
-    fun searchResults_handlesNotFoundException() = runTest {
-        whenever(gitHubRepository.searchRepositories("notfound")).thenAnswer { throw NotFoundException(404) }
-
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(404, snackbar.formatArgs[0])
-                assertEquals(R.string.error_not_found, snackbar.formatArgs[1])
-            }
-        }
-
-        viewModel.searchResults("notfound")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    fun searchResults_handlesUnauthorizedException() = testSearchResultsErrorHandler(
+        query = "unauthorized",
+        thrownException = RateLimitException(401, System.currentTimeMillis() + 5000)
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(401, snackbar.formatArgs[0])
+        assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
+        assertTrue((snackbar.formatArgs[2] as Long) >= 1)
     }
 
     @Test
-    fun searchResults_handlesClientErrorException() = runTest {
-        whenever(gitHubRepository.searchRepositories("clienterror")).thenAnswer { throw ClientErrorException(422, "Unprocessable Entity") }
-
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(422, snackbar.formatArgs[0])
-                assertEquals(R.string.error_client, snackbar.formatArgs[1])
-            }
-        }
-
-        viewModel.searchResults("clienterror")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    fun searchResults_handlesNotFoundException() = testSearchResultsErrorHandler(
+    query = "notfound",
+    thrownException = RateLimitException(404, System.currentTimeMillis() + 5000)
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(404, snackbar.formatArgs[0])
+        assertEquals(R.string.error_rate_limit, snackbar.formatArgs[1])
+        assertTrue((snackbar.formatArgs[2] as Long) >= 1)
     }
 
     @Test
-    fun searchResults_handlesServerErrorException() = runTest {
-        whenever(gitHubRepository.searchRepositories("servererror")).thenAnswer { throw ServerErrorException(500, "Internal Server Error") }
-
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_with_code, snackbar.messageResId)
-                assertEquals(500, snackbar.formatArgs[0])
-                assertEquals(R.string.error_server, snackbar.formatArgs[1])
-            }
-        }
-
-        viewModel.searchResults("servererror")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    fun searchResults_handlesClientErrorException() = testSearchResultsErrorHandler(
+        query = "clienterror",
+        thrownException = ClientErrorException(422, "Unprocessable Entity")
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(422, snackbar.formatArgs[0])
+        assertEquals(R.string.error_client, snackbar.formatArgs[1])
     }
 
     @Test
-    fun searchResults_handlesGenericException() = runTest {
-        whenever(gitHubRepository.searchRepositories("genericerror")).thenAnswer { throw Exception("Unknown error") }
+    fun searchResults_handlesServerErrorException() = testSearchResultsErrorHandler(
+        query = "servererror",
+        thrownException = ServerErrorException(500, "Internal Server Error")
+    ) { snackbar ->
+        assertEquals(R.string.error_with_code, snackbar.messageResId)
+        assertEquals(500, snackbar.formatArgs[0])
+        assertEquals(R.string.error_server, snackbar.formatArgs[1])
+    }
 
-        val job = launch {
-            viewModel.showErrorFlow.collect { message ->
-                assertTrue(message is UserMessage.SnackBar)
-                val snackbar = message as UserMessage.SnackBar
-                assertEquals(R.string.error_unknown, snackbar.messageResId)
-            }
-        }
-
-        viewModel.searchResults("genericerror")
-        advanceUntilIdle()
-
-        assertTrue(viewModel.items.first().isEmpty())
-        assertFalse(viewModel.isLoading.first())
-        job.cancel()
+    @Test
+    fun searchResults_handlesGenericException() = testSearchResultsErrorHandler(
+        query = "genericerror",
+        thrownException = Exception("Unknown error")
+    ) { snackbar ->
+        assertEquals(R.string.error_unknown, snackbar.messageResId)
     }
 
     @Test
