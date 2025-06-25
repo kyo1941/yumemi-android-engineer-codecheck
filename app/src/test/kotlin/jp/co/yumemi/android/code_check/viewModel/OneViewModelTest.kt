@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.viewModel
 
+import app.cash.turbine.test
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.common.UserMessage
 import jp.co.yumemi.android.code_check.domain.model.Item
@@ -264,16 +265,11 @@ class OneViewModelTest {
             searchedAt = Date()
         )
 
-        val job = launch {
-            viewModel.navigateToRepositoryFlow.collect { item ->
-                assertEquals(testItem, item)
-            }
+        viewModel.navigateToRepositoryFlow.test {
+            viewModel.onRepositorySelected(testItem)
+            assertEquals(testItem, awaitItem())
+            expectNoEvents()
         }
-
-        viewModel.onRepositorySelected(testItem)
-        advanceUntilIdle() // Ensure the send operation completes
-
-        job.cancel()
     }
 }
 
