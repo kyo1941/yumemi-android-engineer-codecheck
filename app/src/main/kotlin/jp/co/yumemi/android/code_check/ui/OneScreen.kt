@@ -120,7 +120,7 @@ fun OneScreen(
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "search icon",
-                    tint = Color.DarkGray
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             trailingIcon = {
@@ -132,7 +132,7 @@ fun OneScreen(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear Text",
-                            tint = Color.DarkGray
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
