@@ -1,6 +1,5 @@
 package jp.co.yumemi.android.code_check.ui
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -71,11 +70,6 @@ fun OneScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val focusManager = LocalFocusManager.current
-
-    Log.d("ColorDebug", "LocalContentColor.current: ${LocalContentColor.current}")
-    Log.d("ColorDebug", "MaterialTheme.colorScheme.onSurface: ${MaterialTheme.colorScheme.onSurface}")
-    Log.d("ColorDebug", "MaterialTheme.colorScheme.onBackground: ${MaterialTheme.colorScheme.onBackground}")
-    Log.d("TypographyDebug", "headlineSmall color: ${MaterialTheme.typography.headlineSmall.color}")
 
     LaunchedEffect(Unit) {
         viewModel.navigateToRepositoryFlow.collectLatest { item ->
