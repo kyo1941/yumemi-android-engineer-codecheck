@@ -82,6 +82,19 @@ class GitHubRepositoryImplTest {
         repo.searchRepositories("kotlin")
     }
 
+    @Test(expected = RateLimitException::class)
+    fun searchRepositories_throws_RateLimitException_on_403_with_RetryAfter() = runTest {
+        val headers = headersOf("Retry-After" to listOf("2"))
+        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
+        repo.searchRepositories("kotlin")
+    }
+
+    @Test(expected = RateLimitException::class)
+    fun searchRepositories_throws_RateLimitException_on_403_with_no_headers() = runTest {
+        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden)
+        repo.searchRepositories("kotlin")
+    }
+
     @Test(expected = Exception::class)
     fun searchRepositories_throws_Exception_on_unexpected_status() = runTest {
         val repo = createRepositoryWithMock(HttpStatusCode(600, "Unknown"))
