@@ -25,8 +25,10 @@ import java.util.Date
 @ExperimentalCoroutinesApi
 class OneViewModelTest {
 
+    private val testScheduler = TestCoroutineScheduler()
+
     @get:Rule
-    val mainDispatcherRule = TestDispatcherRule()
+    val mainDispatcherRule = TestDispatcherRule(StandardTestDispatcher(testScheduler))
 
     @Mock
     private lateinit var gitHubRepository: GitHubRepository
@@ -36,7 +38,7 @@ class OneViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        viewModel = OneViewModel(gitHubRepository)
+        viewModel = OneViewModel(gitHubRepository, clock = { testScheduler.currentTime })
     }
 
     @Test
