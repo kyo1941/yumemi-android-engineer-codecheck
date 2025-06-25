@@ -269,6 +269,19 @@ class OneViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun onSearchTextChanged_emptyTextDoesNotClearEmptyInputError() = runTest {
+        viewModel.setEmptyInput(true)
+        viewModel.onSearchTextChanged("")
+        assertTrue(viewModel.isEmptyInput.first())
+
+        viewModel.setEmptyInput(false)
+        viewModel.onSearchTextChanged("")
+        assertFalse(viewModel.isEmptyInput.first())
+    }
+
+
 }
 
 // Utility for setting up TestDispatcher
