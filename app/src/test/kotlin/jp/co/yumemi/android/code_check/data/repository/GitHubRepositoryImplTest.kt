@@ -45,6 +45,22 @@ class GitHubRepositoryImplTest {
         assertEquals("test/repo", result[0].name)
     }
 
+    @Test
+    fun searchRepositories_returnsEmptyList_whenItemsMissing() = runTest {
+        val json = "{}"
+        val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
+        val result = repo.searchRepositories("kotlin")
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun searchRepositories_returnsEmptyList_whenItemsNull() = runTest {
+        val json = """{"items": null}"""
+        val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
+        val result = repo.searchRepositories("kotlin")
+        assertTrue(result.isEmpty())
+    }
+
     @Test(expected = BadRequestException::class)
     fun searchRepositories_throws_BadRequestException_on_400() = runTest {
         val repo = createRepositoryWithMock(HttpStatusCode.BadRequest)
