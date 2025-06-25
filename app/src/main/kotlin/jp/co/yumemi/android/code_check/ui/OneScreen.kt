@@ -36,7 +36,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -153,7 +152,7 @@ fun OneScreen(
                 }
             ),
             colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.LightGray,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
             ),
             modifier = Modifier.fillMaxWidth().shadow(40.dp, RoundedCornerShape(16.dp))
         )
@@ -187,7 +186,7 @@ fun OneScreen(
                     )
                     if (index < items.lastIndex) {
                         HorizontalDivider(
-                            color = Color.LightGray,
+                            color = MaterialTheme.colorScheme.outline,
                             thickness = 1.dp
                         )
                     }
