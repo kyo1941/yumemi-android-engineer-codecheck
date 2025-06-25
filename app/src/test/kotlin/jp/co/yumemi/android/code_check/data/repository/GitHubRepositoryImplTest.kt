@@ -22,6 +22,24 @@ class GitHubRepositoryImplTest {
         return GitHubRepositoryImpl(client)
     }
 
+    private fun <T : Exception> testSearchRepositoriesException(
+        statusCode: HttpStatusCode,
+        expectedException: Class<T>,
+        headers: Headers = headersOf()
+    ) = runTest {
+        val repo = createRepositoryWithMock(statusCode, headers = headers)
+        try {
+            repo.searchRepositories("kotlin")
+            fail("Expected ${expectedException.simpleName} but no exception was thrown.")
+        } catch (e: Exception) {
+            assertEquals(
+                "Expected ${expectedException.simpleName} but got ${e::class.simpleName}",
+                expectedException,
+                e::class.java
+            )
+        }
+    }
+
     @Test
     fun searchRepositories_returnsItems_on200() = runTest {
         val json = """
@@ -129,73 +147,62 @@ class GitHubRepositoryImplTest {
         assertTrue(result.isEmpty())
     }
 
-    @Test(expected = BadRequestException::class)
+    @Test
     fun searchRepositories_throws_BadRequestException_on_400() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode.BadRequest)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.BadRequest, BadRequestException::class.java)
     }
 
-    @Test(expected = UnauthorizedException::class)
+    @Test
     fun searchRepositories_throws_UnauthorizedException_on_401() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode.Unauthorized)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Unauthorized, UnauthorizedException::class.java)
     }
 
-    @Test(expected = NotFoundException::class)
+    @Test
     fun searchRepositories_throws_NotFoundException_on_404() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode.NotFound)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.NotFound, NotFoundException::class.java)
     }
 
-    @Test(expected = ClientErrorException::class)
+    @Test
     fun searchRepositories_throws_ClientErrorException_on_418() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode(418, "I'm a teapot"))
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode(418, "I'm a teapot"), ClientErrorException::class.java)
     }
 
-    @Test(expected = ServerErrorException::class)
+    @Test
     fun searchRepositories_throws_ServerErrorException_on_500() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode.InternalServerError)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.InternalServerError, ServerErrorException::class.java)
     }
 
-    @Test(expected = RateLimitException::class)
+    @Test
     fun searchRepositories_throws_RateLimitException_on_403() = runTest {
         val headers = headersOf("X-RateLimit-Remaining" to listOf("0"), "X-RateLimit-Reset" to listOf("${1672531200}"))
-        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Forbidden, RateLimitException::class.java, headers)
     }
 
-    @Test(expected = RateLimitException::class)
+    @Test
     fun searchRepositories_throws_RateLimitException_on_403_with_RetryAfter() = runTest {
         val headers = headersOf("Retry-After" to listOf("2"))
-        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Forbidden, RateLimitException::class.java, headers)
     }
 
-    @Test(expected = RateLimitException::class)
+    @Test
     fun searchRepositories_throws_RateLimitException_on_403_with_invalid_remaining() = runTest {
         val headers = headersOf("X-RateLimit-Remaining" to listOf("abc"), "X-RateLimit-Reset" to listOf("${1672531200}"))
-        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Forbidden, RateLimitException::class.java, headers)
     }
 
-    @Test(expected = RateLimitException::class)
+    @Test
     fun searchRepositories_throws_RateLimitException_on_403_with_no_headers() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Forbidden, RateLimitException::class.java)
     }
 
-    @Test(expected = RateLimitException::class)
+    @Test
     fun searchRepositories_throws_RateLimitException_on_403_with_remaining_zero_but_no_reset() = runTest {
         val headers = headersOf("X-RateLimit-Remaining" to listOf("0"))
-        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode.Forbidden, RateLimitException::class.java, headers)
     }
 
-    @Test(expected = Exception::class)
+    @Test
     fun searchRepositories_throws_Exception_on_unexpected_status() = runTest {
-        val repo = createRepositoryWithMock(HttpStatusCode(600, "Unknown"))
-        repo.searchRepositories("kotlin")
+        testSearchRepositoriesException(HttpStatusCode(600, "Unknown"), Exception::class.java)
     }
 }
