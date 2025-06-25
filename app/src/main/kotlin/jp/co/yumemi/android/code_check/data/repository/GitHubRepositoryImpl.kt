@@ -7,7 +7,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import jp.co.yumemi.android.code_check.domain.model.Item
-import jp.co.yumemi.android.code_check.data.api.GitHubApiClient
 import jp.co.yumemi.android.code_check.domain.repository.GitHubRepository
 import jp.co.yumemi.android.code_check.exceptions.BadRequestException
 import jp.co.yumemi.android.code_check.exceptions.ClientErrorException
