@@ -113,7 +113,7 @@ fun OneScreen(
             isError = isEmptyInput,
             supportingText = {
                 if (isEmptyInput) {
-                    Text(stringResource(R.string.error_empty_search), color = Color.Red)
+                    Text(stringResource(R.string.error_empty_search), color = MaterialTheme.colorScheme.error)
                 }
             },
             leadingIcon = {
