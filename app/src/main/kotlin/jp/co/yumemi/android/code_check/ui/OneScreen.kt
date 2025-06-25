@@ -1,7 +1,6 @@
 package jp.co.yumemi.android.code_check.ui
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -27,7 +26,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -99,10 +97,10 @@ fun OneScreen(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            style = LocalTextStyle.current.copy(
+            style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,8 +113,8 @@ fun OneScreen(
             label = {
                 Text(
                     text = stringResource(R.string.searchInputText_hint),
-                    style = LocalTextStyle.current.copy(
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 )
             },
@@ -128,9 +126,8 @@ fun OneScreen(
                 if (isEmptyInput) {
                     Text(
                         text = stringResource(R.string.error_empty_search),
-                        style = LocalTextStyle.current.copy(
+                        style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.error,
-                            fontSize = MaterialTheme.typography.bodySmall.fontSize
                         ),
                     )
                 }
@@ -202,7 +199,6 @@ fun OneScreen(
                             .clickable {
                                 viewModel.onRepositorySelected(item)
                             },
-                        style = LocalTextStyle.current
                     )
                     if (index < items.lastIndex) {
                         HorizontalDivider(

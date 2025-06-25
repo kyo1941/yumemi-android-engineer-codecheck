@@ -106,26 +106,27 @@ fun RepositoryScreen(
             Column {
                 Text(
                     text = stringResource(R.string.stars_count, item.stargazersCount),
-                    style = LocalTextStyle.current.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
+
                 )
                 Text(
                     text = stringResource(R.string.watchers_count, item.watchersCount),
-                    style = LocalTextStyle.current.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                 )
                 Text(
                     text = stringResource(R.string.forks_count, item.forksCount),
-                    style = LocalTextStyle.current.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                 )
                 Text(
                     text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                    style = LocalTextStyle.current.copy(
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                 )
             }
