@@ -235,24 +235,19 @@ class OneViewModelTest {
         )
         whenever(gitHubRepository.searchRepositories(any())).thenReturn(testItems)
 
-        var fakeTime = 0L
-        val fakeClock: () -> Long = { fakeTime }
-
-        // 仮想時間を返すクロックを注入
-        viewModel = OneViewModel(gitHubRepository, clock = fakeClock)
+        testScheduler.advanceTimeBy(1L)
 
         viewModel.searchResults("first")
         advanceUntilIdle()
+        verify(gitHubRepository, times(1)).searchRepositories("first")
 
-        val startTime = fakeTime
-        fakeTime += 1000L
+        testScheduler.advanceTimeBy(500)
 
         viewModel.searchResults("second")
         advanceUntilIdle()
-        val endTime = fakeTime
 
-        assertTrue(endTime - startTime >= 1000L)
-        verify(gitHubRepository, times(2)).searchRepositories(any())
+        assertTrue(testScheduler.currentTime >= 1000)
+        verify(gitHubRepository, times(1)).searchRepositories("second")
     }
 
     @Test
