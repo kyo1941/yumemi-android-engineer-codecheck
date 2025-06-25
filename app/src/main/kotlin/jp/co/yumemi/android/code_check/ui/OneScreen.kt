@@ -2,6 +2,7 @@ package jp.co.yumemi.android.code_check.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -160,12 +161,15 @@ fun OneScreen(
         Spacer(modifier = Modifier.weight(0.1f))
 
         if (isLoading) {
-            CircularProgressIndicator(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp),
-                color = Color.Blue
-            )
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
