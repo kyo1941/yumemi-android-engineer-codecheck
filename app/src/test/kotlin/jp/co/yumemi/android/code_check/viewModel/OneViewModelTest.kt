@@ -280,8 +280,6 @@ class OneViewModelTest {
         viewModel.onSearchTextChanged("")
         assertFalse(viewModel.isEmptyInput.first())
     }
-
-
 }
 
 // Utility for setting up TestDispatcher
