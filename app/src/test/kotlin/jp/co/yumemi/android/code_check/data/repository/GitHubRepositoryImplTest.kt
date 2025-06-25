@@ -174,6 +174,13 @@ class GitHubRepositoryImplTest {
     }
 
     @Test(expected = RateLimitException::class)
+    fun searchRepositories_throws_RateLimitException_on_403_with_invalid_remaining() = runTest {
+        val headers = headersOf("X-RateLimit-Remaining" to listOf("abc"), "X-RateLimit-Reset" to listOf("${1672531200}"))
+        val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
+        repo.searchRepositories("kotlin")
+    }
+
+    @Test(expected = RateLimitException::class)
     fun searchRepositories_throws_RateLimitException_on_403_with_no_headers() = runTest {
         val repo = createRepositoryWithMock(HttpStatusCode.Forbidden)
         repo.searchRepositories("kotlin")
