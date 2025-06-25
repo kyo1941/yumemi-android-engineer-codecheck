@@ -53,7 +53,7 @@ class OneViewModelTest {
                 watchersCount = 50,
                 forksCount = 20,
                 openIssuesCount = 5,
-                searchedAt = Date()
+                searchedAt = Date(testScheduler.currentTime)
             )
         )
         whenever(gitHubRepository.searchRepositories("kotlin")).thenReturn(testItems)
@@ -174,7 +174,7 @@ class OneViewModelTest {
                 watchersCount = 50,
                 forksCount = 20,
                 openIssuesCount = 5,
-                searchedAt = Date()
+                searchedAt = Date(testScheduler.currentTime)
             )
         )
         whenever(gitHubRepository.searchRepositories(any())).thenReturn(testItems)
@@ -238,7 +238,7 @@ class OneViewModelTest {
                 watchersCount = 50,
                 forksCount = 20,
                 openIssuesCount = 5,
-                searchedAt = Date()
+                searchedAt = Date(testScheduler.currentTime)
             )
         )
         whenever(gitHubRepository.searchRepositories("kotlin")).thenReturn(testItems)
@@ -260,7 +260,7 @@ class OneViewModelTest {
             watchersCount = 5,
             forksCount = 2,
             openIssuesCount = 1,
-            searchedAt = Date()
+            searchedAt = Date(testScheduler.currentTime)
         )
 
         viewModel.navigateToRepositoryFlow.test {
