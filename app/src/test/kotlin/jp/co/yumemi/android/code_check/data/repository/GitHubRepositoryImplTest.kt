@@ -77,7 +77,7 @@ class GitHubRepositoryImplTest {
 
     @Test(expected = RateLimitException::class)
     fun searchRepositories_throws_RateLimitException_on_403() = runTest {
-        val headers = headersOf("X-RateLimit-Remaining" to listOf("0"), "X-RateLimit-Reset" to listOf("${System.currentTimeMillis() / 1000 + 60}"))
+        val headers = headersOf("X-RateLimit-Remaining" to listOf("0"), "X-RateLimit-Reset" to listOf("${1672531200}"))
         val repo = createRepositoryWithMock(HttpStatusCode.Forbidden, headers = headers)
         repo.searchRepositories("kotlin")
     }
