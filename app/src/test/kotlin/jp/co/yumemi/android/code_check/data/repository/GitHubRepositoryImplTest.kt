@@ -69,7 +69,49 @@ class GitHubRepositoryImplTest {
         assertEquals("test/repo", result[0].name)
     }
 
+    @Test
+    fun searchRepositories_ownerNull_setsOwnerIconUrlEmpty() = runTest {
+        val json = """
+        {
+            "items": [
+                {
+                    "full_name": "test/repo",
+                    "owner": null,
+                    "language": "Kotlin",
+                    "stargazers_count": 1,
+                    "watchers_count": 2,
+                    "forks_count": 3,
+                    "open_issues_count": 4
+                }
+            ]
+        }
+    """.trimIndent()
+        val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
+        val result = repo.searchRepositories("kotlin")
+        assertEquals("", result[0].ownerIconUrl)
+    }
 
+    @Test
+    fun searchRepositories_ownerWithoutAvatar_setsOwnerIconUrlEmpty() = runTest {
+        val json = """
+        {
+            "items": [
+                {
+                    "full_name": "test/repo",
+                    "owner": {},
+                    "language": "Kotlin",
+                    "stargazers_count": 1,
+                    "watchers_count": 2,
+                    "forks_count": 3,
+                    "open_issues_count": 4
+                }
+            ]
+        }
+    """.trimIndent()
+        val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
+        val result = repo.searchRepositories("kotlin")
+        assertEquals("", result[0].ownerIconUrl)
+    }
 
     @Test
     fun searchRepositories_returnsEmptyList_whenItemsMissing() = runTest {
