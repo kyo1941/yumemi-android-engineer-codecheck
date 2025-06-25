@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.navigation.AppNavHost
+import jp.co.yumemi.android.code_check.ui.theme.AppTheme
 
 @AndroidEntryPoint
 class TopActivity : ComponentActivity() {
@@ -26,7 +27,9 @@ class TopActivity : ComponentActivity() {
                 window.statusBarColor = Color.Transparent.toArgb()
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
             }
-            AppNavHost()
+            AppTheme {
+                AppNavHost()
+            }
         }
     }
 }
