@@ -46,6 +46,32 @@ class GitHubRepositoryImplTest {
     }
 
     @Test
+    fun searchRepositories_skipsNullItems() = runTest {
+        val json = """
+        {
+            "items": [
+                null,
+                {
+                    "full_name": "test/repo",
+                    "owner": {"avatar_url": "url"},
+                    "language": "Kotlin",
+                    "stargazers_count": 1,
+                    "watchers_count": 2,
+                    "forks_count": 3,
+                    "open_issues_count": 4
+                }
+            ]
+        }
+    """.trimIndent()
+        val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
+        val result = repo.searchRepositories("kotlin")
+        assertEquals(1, result.size)
+        assertEquals("test/repo", result[0].name)
+    }
+
+
+
+    @Test
     fun searchRepositories_returnsEmptyList_whenItemsMissing() = runTest {
         val json = "{}"
         val repo = createRepositoryWithMock(HttpStatusCode.OK, json)
