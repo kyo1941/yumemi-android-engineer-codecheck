@@ -107,7 +107,7 @@ class OneViewModelTest {
     @Test
     fun searchResults_handlesRateLimitException() = testSearchResultsErrorHandler(
         query = "limit",
-        thrownException = RateLimitException(403, System.currentTimeMillis() + 5000)
+        thrownException = RateLimitException(403, testScheduler.currentTime + 5000)
     ) { snackbar ->
         assertEquals(R.string.error_with_code, snackbar.messageResId)
         assertEquals(403, snackbar.formatArgs[0])
