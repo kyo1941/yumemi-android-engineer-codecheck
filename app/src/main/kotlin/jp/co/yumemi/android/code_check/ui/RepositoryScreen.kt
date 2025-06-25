@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +51,7 @@ fun RepositoryScreen(
             Icon(
                 painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
                 contentDescription = "back one screen",
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
         AsyncImage(
@@ -64,7 +66,10 @@ fun RepositoryScreen(
 
         Text(
             text = item.name,
-            style = MaterialTheme.typography.headlineMedium,
+            style = LocalTextStyle.current.copy(
+                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
@@ -73,7 +78,9 @@ fun RepositoryScreen(
 
         Text(
             text = "Information",
-            style = MaterialTheme.typography.titleLarge,
+            style = LocalTextStyle.current.copy(
+                fontSize = MaterialTheme.typography.titleLarge.fontSize
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
@@ -89,7 +96,9 @@ fun RepositoryScreen(
 
             Text(
                 text = item.language,
-                style = MaterialTheme.typography.bodyLarge
+                style = LocalTextStyle.current.copy(
+                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                ),
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -97,19 +106,28 @@ fun RepositoryScreen(
             Column {
                 Text(
                     text = stringResource(R.string.stars_count, item.stargazersCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+
                 )
                 Text(
                     text = stringResource(R.string.watchers_count, item.watchersCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
                 )
                 Text(
                     text = stringResource(R.string.forks_count, item.forksCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
                 )
                 Text(
                     text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
                 )
             }
 

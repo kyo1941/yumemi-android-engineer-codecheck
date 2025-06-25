@@ -2,6 +2,7 @@ package jp.co.yumemi.android.code_check.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -35,7 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -90,12 +91,14 @@ fun OneScreen(
     ) {
         Text(
             text = stringResource(R.string.app_name),
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            textAlign = TextAlign.Center,
+                .padding(16.dp),
         )
 
         OutlinedTextField(
@@ -104,7 +107,9 @@ fun OneScreen(
             label = {
                 Text(
                     text = stringResource(R.string.searchInputText_hint),
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 )
             },
             shape = RoundedCornerShape(16.dp),
@@ -113,14 +118,19 @@ fun OneScreen(
             isError = isEmptyInput,
             supportingText = {
                 if (isEmptyInput) {
-                    Text(stringResource(R.string.error_empty_search), color = Color.Red)
+                    Text(
+                        text = stringResource(R.string.error_empty_search),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.error,
+                        ),
+                    )
                 }
             },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
                     contentDescription = "search icon",
-                    tint = Color.DarkGray
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             },
             trailingIcon = {
@@ -132,7 +142,7 @@ fun OneScreen(
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear Text",
-                            tint = Color.DarkGray
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
@@ -152,7 +162,7 @@ fun OneScreen(
                 }
             ),
             colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = Color.LightGray,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
             ),
             modifier = Modifier.fillMaxWidth().shadow(40.dp, RoundedCornerShape(16.dp))
         )
@@ -160,12 +170,15 @@ fun OneScreen(
         Spacer(modifier = Modifier.weight(0.1f))
 
         if (isLoading) {
-            CircularProgressIndicator(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp),
-                color = Color.Blue
-            )
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -179,11 +192,11 @@ fun OneScreen(
                             .padding(vertical = 16.dp)
                             .clickable {
                                 viewModel.onRepositorySelected(item)
-                            }
+                            },
                     )
                     if (index < items.lastIndex) {
                         HorizontalDivider(
-                            color = Color.LightGray,
+                            color = MaterialTheme.colorScheme.outline,
                             thickness = 1.dp
                         )
                     }
