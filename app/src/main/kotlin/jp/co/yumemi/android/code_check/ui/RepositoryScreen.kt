@@ -36,7 +36,7 @@ fun RepositoryScreen(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val imageSize: Dp = if (isLandscape) (screenWidth * 0.25f).coerceAtMost(160.dp) else (screenHeight * 0.25f).coerceAtMost(160.dp)
+    val imageSize: Dp = (if (isLandscape) (screenWidth * 0.25f) else (screenHeight * 0.25f)).coerceAtMost(160.dp)
     val imageCornerRadius: Dp = (imageSize * 0.2f).coerceAtLeast(8.dp)
 
     if(!isLandscape) {
