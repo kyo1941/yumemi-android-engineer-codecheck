@@ -97,30 +97,11 @@ fun RepositoryScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Column {
-                    Text(
-                        text = stringResource(R.string.stars_count, item.stargazersCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-
-                    )
-                    Text(
-                        text = stringResource(R.string.watchers_count, item.watchersCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    )
-                    Text(
-                        text = stringResource(R.string.forks_count, item.forksCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    )
-                    Text(
-                        text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                    RepositoryStatsColumn(
+                        stargazersCount = item.stargazersCount,
+                        watchersCount = item.watchersCount,
+                        forksCount = item.forksCount,
+                        openIssuesCount = item.openIssuesCount
                     )
                 }
 
@@ -190,29 +171,11 @@ fun RepositoryScreen(
                     )
 
                     Column {
-                        Text(
-                            text = stringResource(R.string.stars_count, item.stargazersCount),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.watchers_count, item.watchersCount),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.forks_count, item.forksCount),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
-                        )
-                        Text(
-                            text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                color = MaterialTheme.colorScheme.onBackground
-                            )
+                        RepositoryStatsColumn(
+                            stargazersCount = item.stargazersCount,
+                            watchersCount = item.watchersCount,
+                            forksCount = item.forksCount,
+                            openIssuesCount = item.openIssuesCount
                         )
                     }
                 }
@@ -221,6 +184,41 @@ fun RepositoryScreen(
             }
             Spacer(modifier = Modifier.weight(1f))
         }
+    }
+}
+
+@Composable
+fun RepositoryStatsColumn(
+    stargazersCount: Long,
+    watchersCount: Long,
+    forksCount: Long,
+    openIssuesCount: Long
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.stars_count, stargazersCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.watchers_count, watchersCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.forks_count, forksCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.open_issues_count, openIssuesCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
     }
 }
 
