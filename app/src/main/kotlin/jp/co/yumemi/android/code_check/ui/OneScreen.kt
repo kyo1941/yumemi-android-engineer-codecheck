@@ -90,18 +90,24 @@ fun OneScreen(
         viewModel.showErrorFlow.collectLatest { userMessage ->
             when (userMessage) {
                 is UserMessage.SnackBar -> {
-                    val message = if (userMessage.formatArgs.isNotEmpty()) {
-                        if (userMessage.formatArgs.size > 1 && userMessage.formatArgs[1] is Int) {
-                            val statusCode = userMessage.formatArgs[0] as Int
-                            val errorDetailResId = userMessage.formatArgs[1] as Int
-                            val extraArgs = userMessage.formatArgs.sliceArray(2 until userMessage.formatArgs.size)
-                            val errorDetailMessage = context.getString(errorDetailResId, *extraArgs)
-                            context.getString(userMessage.messageResId, statusCode, errorDetailMessage)
-                        } else {
+                    val message = when {
+                        userMessage.formatArgs.isEmpty() -> {
+                            context.getString(userMessage.messageResId)
+                        }
+                        userMessage.formatArgs.size > 1 -> {
+                            val statusCode = userMessage.formatArgs[0] as? Int
+                            val errorDetailResId = userMessage.formatArgs[1] as? Int
+                            if (statusCode != null && errorDetailResId != null) {
+                                val extraArgs = userMessage.formatArgs.sliceArray(2 until userMessage.formatArgs.size)
+                                val errorDetailMessage = context.getString(errorDetailResId, *extraArgs)
+                                context.getString(userMessage.messageResId, statusCode, errorDetailMessage)
+                            } else {
+                                context.getString(userMessage.messageResId, *userMessage.formatArgs)
+                            }
+                        }
+                        else -> {
                             context.getString(userMessage.messageResId, *userMessage.formatArgs)
                         }
-                    } else {
-                        context.getString(userMessage.messageResId)
                     }
                     snackbarHostState.showSnackbar(message)
                 }
