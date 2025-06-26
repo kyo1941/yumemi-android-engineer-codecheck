@@ -73,7 +73,7 @@ dependencies {
 
     implementation 'io.coil-kt:coil-compose:2.3.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
     implementation 'io.ktor:ktor-client-core:2.3.7'
     implementation 'io.ktor:ktor-client-android:2.3.7'
     testImplementation 'io.ktor:ktor-client-mock:2.3.7'
@@ -87,7 +87,7 @@ dependencies {
 
     testImplementation 'org.mockito:mockito-core:5.2.0'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:5.2.1'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
     testImplementation 'app.cash.turbine:turbine:1.1.0'
 
     apply plugin: 'jacoco'
