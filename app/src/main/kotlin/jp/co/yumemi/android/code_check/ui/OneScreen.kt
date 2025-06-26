@@ -58,8 +58,6 @@ import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.common.UserMessage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlin.collections.get
-import kotlin.compareTo
 
 
 @Composable
