@@ -26,17 +26,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -50,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.common.UserMessage
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -68,6 +74,9 @@ fun OneScreen(
     val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
@@ -77,127 +86,160 @@ fun OneScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues())
-            .padding(8.dp)
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    focusManager.clearFocus()
-                })
+    LaunchedEffect(Unit) {
+        viewModel.showErrorFlow.collectLatest { userMessage ->
+            when (userMessage) {
+                is UserMessage.SnackBar -> {
+                    val message = when {
+                        userMessage.formatArgs.isEmpty() -> {
+                            context.getString(userMessage.messageResId)
+                        }
+                        userMessage.formatArgs.size > 1 -> {
+                            val statusCode = userMessage.formatArgs[0] as? Int
+                            val errorDetailResId = userMessage.formatArgs[1] as? Int
+                            if (statusCode != null && errorDetailResId != null) {
+                                val extraArgs = userMessage.formatArgs.sliceArray(2 until userMessage.formatArgs.size)
+                                val errorDetailMessage = context.getString(errorDetailResId, *extraArgs)
+                                context.getString(userMessage.messageResId, statusCode, errorDetailMessage)
+                            } else {
+                                context.getString(userMessage.messageResId, *userMessage.formatArgs)
+                            }
+                        }
+                        else -> {
+                            context.getString(userMessage.messageResId, *userMessage.formatArgs)
+                        }
+                    }
+                    snackbarHostState.showSnackbar(message)
+                }
             }
-    ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground
-            ),
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { _ ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        )
-
-        OutlinedTextField(
-            value = searchText,
-            onValueChange = { viewModel.onSearchTextChanged(it) },
-            label = {
-                Text(
-                    text = stringResource(R.string.searchInputText_hint),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                )
-            },
-            shape = RoundedCornerShape(16.dp),
-            singleLine = true,
-            maxLines = 1,
-            isError = isEmptyInput,
-            supportingText = {
-                if (isEmptyInput) {
-                    Text(
-                        text = stringResource(R.string.error_empty_search),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.error,
-                        ),
-                    )
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues())
+                .padding(8.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
                 }
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "search icon",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
-            trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = {
-                        viewModel.onSearchTextChanged("")
-                        viewModel.clearResults()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear Text",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                }
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    if (!viewModel.isValidInput(searchText)) {
-                        viewModel.setEmptyInput(true)
-                        return@KeyboardActions
-                    }
-                    viewModel.setEmptyInput(false)
-                    coroutineScope.launch {
-                        viewModel.searchResults(searchText)
-                        keyboardController?.hide()
-                    }
-                }
-            ),
-            colors = TextFieldDefaults.colors(
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-            ),
-            modifier = Modifier.fillMaxWidth().shadow(40.dp, RoundedCornerShape(16.dp))
-        )
-
-        Spacer(modifier = Modifier.weight(0.1f))
-
-        if (isLoading) {
-            Box(
+        ) {
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
+                ),
                 modifier = Modifier
-                    .fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                itemsIndexed(items) { index, item ->
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            )
+
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { viewModel.onSearchTextChanged(it) },
+                label = {
                     Text(
-                        text = item.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp)
-                            .clickable {
-                                viewModel.onRepositorySelected(item)
-                            },
-                    )
-                    if (index < items.lastIndex) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outline,
-                            thickness = 1.dp
+                        text = stringResource(R.string.searchInputText_hint),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground
                         )
+                    )
+                },
+                shape = RoundedCornerShape(16.dp),
+                singleLine = true,
+                maxLines = 1,
+                isError = isEmptyInput,
+                supportingText = {
+                    if (isEmptyInput) {
+                        Text(
+                            text = stringResource(R.string.error_empty_search),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.error,
+                            ),
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "search icon",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+                },
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(onClick = {
+                            viewModel.onSearchTextChanged("")
+                            viewModel.clearResults()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear Text",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        if (!viewModel.isValidInput(searchText)) {
+                            viewModel.setEmptyInput(true)
+                            return@KeyboardActions
+                        }
+                        viewModel.setEmptyInput(false)
+                        coroutineScope.launch {
+                            viewModel.searchResults(searchText)
+                            keyboardController?.hide()
+                        }
+                    }
+                ),
+                colors = TextFieldDefaults.colors(
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                ),
+                modifier = Modifier.fillMaxWidth().shadow(40.dp, RoundedCornerShape(16.dp))
+            )
+
+            Spacer(modifier = Modifier.weight(0.1f))
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    itemsIndexed(items) { index, item ->
+                        Text(
+                            text = item.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp)
+                                .clickable {
+                                    viewModel.onRepositorySelected(item)
+                                },
+                        )
+                        if (index < items.lastIndex) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outline,
+                                thickness = 1.dp
+                            )
+                        }
                     }
                 }
             }
