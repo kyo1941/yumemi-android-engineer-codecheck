@@ -1,10 +1,10 @@
 package jp.co.yumemi.android.code_check.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -33,107 +34,191 @@ fun RepositoryScreen(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val imageSize: Dp = (screenHeight * 0.25f).coerceAtMost(160.dp)
+    val screenWidth = configuration.screenWidthDp.dp
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val imageSize: Dp = (if (isLandscape) (screenWidth * 0.25f) else (screenHeight * 0.25f)).coerceAtMost(160.dp)
     val imageCornerRadius: Dp = (imageSize * 0.2f).coerceAtLeast(8.dp)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        IconButton(
-            modifier = Modifier.align(Alignment.Start),
-            onClick = {
-                navController.popBackStack()
+    if(!isLandscape) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            IconButton(
+                modifier = Modifier.align(Alignment.Start),
+                onClick = {
+                    navController.popBackStack()
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
+                    contentDescription = "back one screen",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
             }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
-                contentDescription = "back one screen",
-                tint = MaterialTheme.colorScheme.onBackground
+            AsyncImage(
+                model = item.ownerIconUrl,
+                contentDescription = "owner icon",
+                modifier = Modifier
+                    .size(imageSize)
+                    .clip(RoundedCornerShape(imageCornerRadius)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.jetbrains),
             )
-        }
-        AsyncImage(
-            model = item.ownerIconUrl,
-            contentDescription = "owner icon",
-            modifier = Modifier
-                .size(imageSize)
-                .clip(RoundedCornerShape(imageCornerRadius)),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.jetbrains),
-        )
-
-        Text(
-            text = item.name,
-            style = LocalTextStyle.current.copy(
-                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                fontWeight = MaterialTheme.typography.headlineMedium.fontWeight
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            textAlign = TextAlign.Center,
-        )
-
-        Text(
-            text = "Information",
-            style = LocalTextStyle.current.copy(
-                fontSize = MaterialTheme.typography.titleLarge.fontSize
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            textAlign = TextAlign.Left,
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Spacer(modifier = Modifier.weight(0.5f))
 
             Text(
-                text = item.language,
-                style = LocalTextStyle.current.copy(
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
+                text = item.name,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontWeight = FontWeight.Bold
                 ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                textAlign = TextAlign.Center,
             )
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(modifier = Modifier.weight(0.5f))
+
+                Text(
+                    text = item.language,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column {
+                    RepositoryStatsColumn(
+                        stargazersCount = item.stargazersCount,
+                        watchersCount = item.watchersCount,
+                        forksCount = item.forksCount,
+                        openIssuesCount = item.openIssuesCount
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(0.5f))
+            }
             Spacer(modifier = Modifier.weight(1f))
-
-            Column {
-                Text(
-                    text = stringResource(R.string.stars_count, item.stargazersCount),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-
-                )
-                Text(
-                    text = stringResource(R.string.watchers_count, item.watchersCount),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                )
-                Text(
-                    text = stringResource(R.string.forks_count, item.forksCount),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                )
-                Text(
-                    text = stringResource(R.string.open_issues_count, item.openIssuesCount),
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
+        }
+    } else {
+        Column (
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues()),
+        ) {
+            IconButton(
+                onClick = {
+                    navController.popBackStack()
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_keyboard_arrow_left_24),
+                    contentDescription = "back one screen",
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.weight(0.8f))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    AsyncImage(
+                        model = item.ownerIconUrl,
+                        contentDescription = "owner icon",
+                        modifier = Modifier
+                            .size(imageSize)
+                            .clip(RoundedCornerShape(imageCornerRadius)),
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(id = R.drawable.jetbrains)
+                    )
+
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        modifier = Modifier.padding(vertical = 16.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Column {
+                    Text(
+                        text = item.language,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onBackground
+                        ),
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Column {
+                        RepositoryStatsColumn(
+                            stargazersCount = item.stargazersCount,
+                            watchersCount = item.watchersCount,
+                            forksCount = item.forksCount,
+                            openIssuesCount = item.openIssuesCount
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            Spacer(modifier = Modifier.weight(1f))
         }
-        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun RepositoryStatsColumn(
+    stargazersCount: Long,
+    watchersCount: Long,
+    forksCount: Long,
+    openIssuesCount: Long
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.stars_count, stargazersCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.watchers_count, watchersCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.forks_count, forksCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
+        Text(
+            text = stringResource(R.string.open_issues_count, openIssuesCount),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        )
     }
 }
 
